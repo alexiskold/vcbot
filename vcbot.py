@@ -3,6 +3,7 @@ import datetime
 import locale
 import angel_list
 import crunchbase
+import product_hunt
 import threading
 
 import smtplib
@@ -47,10 +48,12 @@ def to_html( startups ):
 
 		last_round = startup.get( "cb_last_round" )
 		if last_round is not None:
-			html = html + '   <a href="%s">%s: %s</a>' % ( 
-				str( crunchbase.funding_web + crunchbase.property( last_round, "permalink" ) ),
-				str( crunchbase.property( last_round, "funding_type" ) ),
-				str( locale.currency( crunchbase.property( last_round, "money_raised_usd" ), grouping=True ) )[:-3] )
+			money_raised = crunchbase.property( last_round, "money_raised_usd" )
+			if money_raised is not None:
+				html = html + '   <a href="%s">%s: %s</a>' % ( 
+					str( crunchbase.funding_web + crunchbase.property( last_round, "permalink" ) ),
+					str( crunchbase.property( last_round, "funding_type" ) ),
+					str( locale.currency( money_raised, grouping=True ) )[:-3] )
 
 	return html
 
@@ -73,7 +76,8 @@ def sort_helper( startup ):
 	return val
 
 def al_recent( startups, d, max_pages ):
-	locations = [ 1664, 1842, 2320, 1870, 1853 ]
+	#locations = [ 1664, 1842, 2320, 1870, 1853 ]
+	locations = [ 1664 ]
 	lc = angel_list.Location_Check( locations )
 	dc = angel_list.Date_Check( d )
 	ac = angel_list.Key_Attr_Check( [ "name", "high_concept", "product_desc", "company_url" ] )
@@ -86,35 +90,46 @@ def al_recent( startups, d, max_pages ):
 		for page in range( 1, max_pages + 1):
 			angel_list.recent_startups( startups, [ ac, sc, dc ], "https://api.angel.co/1/tags/%s" % location + "/startups?page=%s" % page )
 
-	for startup in startups:
-		crunchbase.total_funding( startup )
-
 	return startups
 
 def cb_recent( startups, d, max_pages ):	
-	fc = crunchbase.Funding_Check( 2000000, 2000000 )
+	#fc = crunchbase.Funding_Check( 2000000, 2000000 )
 	dc = crunchbase.Date_Check( d )
+	#['new york', 'new york city', 'france', 'sweden', 'finland', 'spain']
+	lc = crunchbase.Location_Check( ['new york', 'new york city' ] )
 	for page in range( 1, max_pages + 1):
-		crunchbase.recent_funding_rounds( startups, [ fc, dc ], "http://www.crunchbase.com/funding-rounds?page=%s" % page )
+		crunchbase.recent_funding_rounds( startups, [ dc, lc ], "http://www.crunchbase.com/funding-rounds?page=%s" % page )
 	return startups
 
 
-send_email( 'alex.iskold@gmail.com', 'alex.iskold@gmail.com', 'Hello World' )
+def ph_recent( startups, d, max_pages ):	
+	#locations = [ 1664, 1842, 2320, 1870, 1853 ]
+	locations = [ 1664 ]
+	lc = angel_list.Location_Check( locations )
+	for page in range( 1, max_pages + 1):
+		product_hunt.recent_hunts( startups, [ lc ], "http://www.producthunt.com/?page=%s" % page )
+	return startups
 
-startups = []
-days_ago=7
-max_pages = 10
-d = datetime.datetime.today() - datetime.timedelta( days=days_ago )
+def recent():
+	startups = []
+	days_ago=7
+	max_pages = 5
+	d = datetime.datetime.today() - datetime.timedelta( days=days_ago )
 
-al_recent( startups, d, max_pages )
-cb_recent( startups, d, max_pages )
+	cb_recent( startups, d, max_pages )
+	al_recent( startups, d, max_pages )
+	ph_recent( startups, d, max_pages )
 
-startups.sort( key=sort_helper )
+	for startup in startups:
+		crunchbase.total_funding( startup )
+		crunchbase.last_round( startup )
 
-f = open('t.html', 'w')
-f.write( "<html><body>" )
-f.write( to_html( startups ) )
-f.write( "</body></html>" )
-f.close()
+	f = open('t.html', 'w')
+	f.write( "<html><body>" )
+	f.write( to_html( startups ) )
+	f.write( "</body></html>" )
+	f.close()
+
+recent()
 
 

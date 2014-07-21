@@ -101,4 +101,18 @@ def sort_helper( startup ):
 
 	return -q * math.sqrt( f )
 
+def find_startup( name ):
+	url = "https://api.angel.co/1/search?type=Startup&query=%s" % name
+	
+	results = bot_utils.load_json( url )
+	if results is None or len( results ) == 0:
+		return None
+
+	al_id = None if results is None else results[0].get( "id" )
+	if al_id is not None:
+		 return bot_utils.load_json( "https://api.angel.co/1/startups/%s" % al_id )
+
+	return None
+
+
 

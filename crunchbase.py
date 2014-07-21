@@ -53,6 +53,7 @@ class Date_Check:
 		round = last_round( startup )
 		if round is not None:
 			d = property( round, "updated_at" )
+
 			if datetime.datetime.fromtimestamp( d ) > self.stop_date:
 				return True
 		return False
@@ -78,8 +79,10 @@ def load_cb_data( startup ):
 			response = startup[ "cb_data" ].get( "data" ).get( "response" )
 			if response is False:
 				startup[ "cb_data" ] = None	
+			else:
+				startup[ "crunchbase_url" ] = base_web + "organization/" + startup.get( "cb_path" )
 		except:
-			print( "can't load: " + startup.get( "name" ) )
+			print( "can't load: " + startup.get( "cb_path" ) )
 	return startup.get( "cb_data" )
 
 def total_funding( startup ):
@@ -110,9 +113,11 @@ def last_round( startup ):
 	if startup.get( "cb_last_round" ) is None:
 		cb_data = load_cb_data( startup )
 		if cb_data is not None: 		
-			round = relationship( cb_data, "funding_rounds" )[ 0 ]
-			url = authenticate( "http://api.crunchbase.com/v/2/" + round.get( "path") )
-			startup[ "cb_last_round" ] = bot_utils.load_json( url )
+			rounds = relationship( cb_data, "funding_rounds" ) 
+			if rounds is not None:
+				round = rounds[0]
+				url = authenticate( "http://api.crunchbase.com/v/2/" + round.get( "path") )
+				startup[ "cb_last_round" ] = bot_utils.load_json( url )
 	return startup.get( "cb_last_round" )
 
 def sort_helper( startup ):
@@ -141,36 +146,17 @@ def init_from_cb( startup ):
 		startup[ "name" ] = property( cb_data, "name" )
 		startup[ "company_url" ] = property( cb_data, "homepage_url" )
 		startup[ "high_concept" ] = property( cb_data, "short_description" )
-		startup[ "crunchbase_url" ] = base_web + "organization/" + startup.get( "cb_path" )
 		location( startup )
 		total_funding( startup )	
 
-def load_companies( page_url ):
-	request  = urllib.request.urlopen( page_url )
-	response = request.read().decode('utf8')
-	request.close()
-
-	anchor='<h4><a href="/organization/'
-	l = len( anchor )
-	startups = []
-
-	idx_start = 0
-	while idx_start != -1:
-		idx_start = response.find( anchor, idx_start )
-		if idx_start != -1:
-			idx_end = response.find( '"', idx_start + l )
-			name = response[ idx_start + l : idx_end ]
-			idx_start = idx_end
-			#print( "Company: %s" % (name) )
-			s = '{ "cb_path" : "' + name + '" }'
-			startups.append( json.loads( s ) )
-	return startups;
 
 def recent_funding_rounds( startups, checks, url ):
 	print( "Crunchbase.recent_funding_rounds => %s" % url ) 
 
-	temp = load_companies( url )
-	for startup in temp:
+	names = bot_utils.find_names( url, '<h4><a href="/organization/', '"', {} )
+	for name in names:
+		s = '{ "cb_path" : "' + name + '" }'
+		startup = json.loads( s )
 		load_cb_data( startup )
 		if startup.get( "cb_data" ) is not None:
 			ok = True
