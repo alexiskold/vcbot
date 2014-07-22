@@ -13,7 +13,7 @@ def to_html( startups ):
 	c = 0
 	html = ""
 
-	locale.setlocale(locale.LC_ALL, 'en_US')
+	locale.setlocale(locale.LC_ALL, 'en_US.utf8')
 
 	for startup in startups:
 		c = c + 1
@@ -57,16 +57,16 @@ def to_html( startups ):
 
 	return html
 
-def send_email( sender, address, content ):
-	d = datetime.datetime.strftime( datetime.datetime.today(), "%d-%m-%Y" )
+def send_email( sender, addresses, content ):
+	d = datetime.datetime.strftime( datetime.datetime.today(), "%m-%d-%Y" )
 
-	msg = MIMEText( content )
+	msg = MIMEText( content, 'html' )
 	msg['Subject'] = d + ': startups to review'
 	msg['From'] = sender
-	msg['To'] = address
+	msg['To'] = ','.join(addresses)
 
 	s = smtplib.SMTP('localhost')
-	s.sendmail( sender, [ address ], msg.as_string() )
+	s.sendmail( sender, addresses, msg.as_string() )
 	s.quit()
 
 def sort_helper( startup ):
@@ -124,12 +124,16 @@ def recent():
 		crunchbase.total_funding( startup )
 		crunchbase.last_round( startup )
 
-	f = open('t.html', 'w')
-	f.write( "<html><body>" )
-	f.write( to_html( startups ) )
-	f.write( "</body></html>" )
-	f.close()
+	return startups
 
-recent()
+startups = recent()
+
+results = "<html><body>%s</body></html>" % to_html( startups )
+send_email( 'alex.iskold@techstars.com', [ 'alex.iskold@techstars.com', 'kj.singh@techstars.com'], results )
+
+f = open('t.html', 'w')
+f.write( results )
+f.close()
+
 
 
