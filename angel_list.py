@@ -4,41 +4,7 @@ import json
 import datetime
 import math
 import bot_utils
-
-
-class Date_Check:
-
-	def __init__( self, stop_date ):
-		self.stop_date = stop_date
-
-	def match( self, startup ):
-		fundraising = startup.get( "fundraising" )
-		if fundraising is not None and fundraising is not False:
-			d = startup.get( "fundraising" ).get( "updated_at" );
-			if d is not None and d is not False and datetime.datetime.strptime( d, "%Y-%m-%dT%H:%M:%SZ" ) > self.stop_date:
-				return True
-
-		d = startup.get( "updated_at" );
-		if d is not None and d is not False and datetime.datetime.strptime( d, "%Y-%m-%dT%H:%M:%SZ" ) > self.stop_date:
-			return True
-
-		return False
-
-class Location_Check:
-
-	def __init__( self, location_list ):
-		self.location_list = location_list;
-
-	def match( self, startup ):
-		locations = startup.get( "locations" );
-		m = False
-		if locations is not None:
-			for location in locations:
-				id = location.get( "id" )
-				if id in self.location_list:
-					m = True
-					break
-		return m
+import crunchbase
 
 class Key_Attr_Check:
 
@@ -73,33 +39,26 @@ class Startup_Check:
 		return m
 
 
-def recent_startups( startups, checks, url ):
+al_checks = [ Startup_Check(), Key_Attr_Check( [ "name", "high_concept", "product_desc", "company_url" ] ) ]
+
+def recent_startups( startups, url, max=1000 ):
 
 	print( "AngelList.recent_startups => %s" % url ) 
 	results = bot_utils.load_json( url )
 		
-	for startup in results.get( "startups" ):
-		m = True
-		for check in checks:
-			if not check.match( startup ):
-				m = False
-				break
-		if m:
-			startups.append( startup )
-			print( "Added: " + startup.get( "name" ) )
-
+	count = 0
+	if results is not None:
+		for al_data in results.get( "startups" ):
+			if bot_utils.match_all( al_data, al_checks ):
+				name = al_data.get( "name" );
+				startup = create( al_data )
+				crunchbase.find_startup( startup, name )
+				startups.append( startup )
+				print( "Found via AL: " + name )
+				count = count + 1
+				if count > max:
+					break
 	return startups;
-
-def sort_helper( startup ):
-	q = startup.get( "quality" )
-	if q is None:
-		return 0
-
-	f = startup.get( "follower_count" )
-	if f is None:
-		return 0
-
-	return -q * math.sqrt( f )
 
 def find_startup( name ):
 	url = "https://api.angel.co/1/search?type=Startup&query=%s" % name
@@ -109,10 +68,51 @@ def find_startup( name ):
 		return None
 
 	al_id = None if results is None else results[0].get( "id" )
+
 	if al_id is not None:
-		 return bot_utils.load_json( "https://api.angel.co/1/startups/%s" % al_id )
+		 al_data = bot_utils.load_json( "https://api.angel.co/1/startups/%s" % al_id )
+		 if al_data is not None:
+		 	if bot_utils.match_all( al_data, al_checks ):
+		 		startup = create( al_data )
+		 		crunchbase.find_startup( startup, name )
+		 		return startup
 
 	return None
 
+def create( al_data ):
+	startup = {}
+	startup[ "al_data" ] = al_data
+	startup[ "name" ] = property( al_data, "name" )
+	startup[ "short_description" ] = property( al_data, "high_concept" )
+	startup[ "description" ] = property( al_data, "product_desc" )
+	startup[ "url" ] = property( al_data, "company_url" )
+	startup[ "angel_list_url" ] = property( al_data, "angellist_url" )
+	startup[ "location" ] = location( al_data )
+	startup[ "tags" ] = tags( al_data )
+	return startup
+	
+def property( startup, prop ):
+	al_data = startup.get( "al_data" )
+	if al_data is None:
+		al_data = startup
 
+	value = None
+	if al_data is not None:
+		value = al_data.get( prop )
+	return value
+
+def location( al_data ):
+	locs = property( al_data, "locations" )
+	loc = None
+	if locs is not None and len( locs ) > 0:
+		loc = locs[0].get( "display_name" ).lower().title()
+	return loc
+
+def tags( al_data ):
+	tags = []
+	markets = al_data.get( "markets" )
+	if markets is not None:		
+		for market in markets:
+			tags.append( market.get( "name").lower() )
+	return tags
 

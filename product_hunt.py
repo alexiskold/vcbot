@@ -13,20 +13,18 @@ def adjust_path( name ):
 		return name[0:idx].strip()
 	return name
 
-def recent_hunts( startups, checks, url ):
+def recent_hunts( startups, url, max=1000 ):
 	print( "Product Hunt.recent_hunts => %s" % url ) 
 
 	names = bot_utils.find_names( url, 'target="_blank">', '</a>', ph_headers )
+	count = 0
 	for name in names:
 		startup = angel_list.find_startup( urllib.request.pathname2url( adjust_path( name ) ) )
 		if startup is not None:
-			ok = True
-			for check in checks:
-				if check.match( startup ) is False:
-					ok = False
-					break
-			if ok:
-				startups.append( startup )
-				print( "Added: " + name )
+			startups.append( startup )
+			print( "Found via PH: " + name )
+			count = count + 1
+			if count > max:
+				break
 	return startups
 

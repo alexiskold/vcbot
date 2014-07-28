@@ -4,7 +4,7 @@ import locale
 import angel_list
 import crunchbase
 import product_hunt
-import threading
+import bot_utils
 
 import smtplib
 from email.mime.text import MIMEText
@@ -13,47 +13,46 @@ def to_html( startups ):
 	c = 0
 	html = ""
 
-	locale.setlocale(locale.LC_ALL, 'en_US.utf8')
+	try:
+		locale.setlocale(locale.LC_ALL, 'en_US.utf8' )
+	except:
+		locale.setlocale(locale.LC_ALL, 'en_US.UTF-8' )
 
 	for startup in startups:
 		c = c + 1
 		
-		n = str( startup.get( "name" ) )
-		hc = str( startup.get( "high_concept" ) )
-		url = str( startup.get( "company_url" ) )
-		loc = startup.get( "cb_location" )
+		n = startup.get( "name" )
+		hc = startup.get( "short_description" )
+		url = startup.get( "url" )
+		loc = startup.get( "location" )
 
-		if loc is None:
-			loc = startup.get( "locations" )
-			if ( loc is not None ):
-				loc = loc[ 0 ].get( "display_name" ).lower();
-		loc = str( loc ).title()
-		
 		html = html + "<p><b>" + str( c ) + ". %s (%s)</b><br/>%s" % ( n, loc, hc )
 		html = html + "<br/>" + "<a href='%s' target='_blank'>URL</a>" % ( url )
 
-		aurl = startup.get( "angellist_url" )
+		aurl = startup.get( "angel_list_url" )
 		if aurl is not None:
-			q = str( startup.get( "quality" ) )
-			f = str( startup.get( "follower_count" ) )
+			q = str( angel_list.property( startup, "quality" ) )
+			f = str( angel_list.property( startup, "follower_count" ) )
 			html = html + "  |  <a href='%s' target='_blank'>AngelList (q=%s, f=%s)</a>" % ( str( aurl ), q, f )
 
 		cburl = startup.get( "crunchbase_url" )
 		if cburl is not None:
 			html = html + "  |  <a href='%s' target='_blank'>CrunchBase</a>" % ( str( cburl ) )		
 		
-		total_funding = startup.get( "cb_total_funding" )
+		total_funding = startup.get( "total_funding" )
 		if total_funding is not None and total_funding != 0 :
 			html = html + "<br/>" + "Funding: %s" % ( str( locale.currency( total_funding, grouping=True ) )[:-3] )
 
-		last_round = startup.get( "cb_last_round" )
+		last_round = startup.get( "last_round" )
 		if last_round is not None:
-			money_raised = crunchbase.property( last_round, "money_raised_usd" )
-			if money_raised is not None:
-				html = html + '   <a href="%s">%s: %s</a>' % ( 
-					str( crunchbase.funding_web + crunchbase.property( last_round, "permalink" ) ),
-					str( crunchbase.property( last_round, "funding_type" ) ),
-					str( locale.currency( money_raised, grouping=True ) )[:-3] )
+			html = html + '   <a href="%s">%s: %s</a>' % ( 
+				str( startup.get( "crunchbase_last_round_url" ) ),
+				str( startup.get( "last_round_type" ) ),
+				str( locale.currency( last_round, grouping=True ) )[:-3] )
+
+		tags = startup.get( "tags" )
+		if len( tags ) != 0:
+			html = html + "<br/>Tags: " + ', '.join( tags )
 
 	return html
 
@@ -69,67 +68,67 @@ def send_email( sender, addresses, content ):
 	s.sendmail( sender, addresses, msg.as_string() )
 	s.quit()
 
-def sort_helper( startup ):
-	val = crunchbase.sort_helper( startup )
-	if val == 0:
-		val = angel_list.sort_helper( startup )
-	return val
-
-def al_recent( startups, d, max_pages ):
-	#locations = [ 1664, 1842, 2320, 1870, 1853 ]
+def al_recent( startups, max_pages ):
 	locations = [ 1664 ]
-	lc = angel_list.Location_Check( locations )
-	dc = angel_list.Date_Check( d )
-	ac = angel_list.Key_Attr_Check( [ "name", "high_concept", "product_desc", "company_url" ] )
-	sc = angel_list.Startup_Check();
 
 	for page in range( 1, max_pages + 1):
-		angel_list.recent_startups( startups, [ ac, sc, lc, dc ], "https://api.angel.co/1/startups?filter=raising&page=%s" % page )
+		angel_list.recent_startups( startups, "https://api.angel.co/1/startups?filter=raising&page=%s" % page )
 
 	for location in locations:
 		for page in range( 1, max_pages + 1):
-			angel_list.recent_startups( startups, [ ac, sc, dc ], "https://api.angel.co/1/tags/%s" % location + "/startups?page=%s" % page )
+			angel_list.recent_startups( startups, "https://api.angel.co/1/tags/%s" % location + "/startups?page=%s" % page )
 
 	return startups
 
-def cb_recent( startups, d, max_pages ):	
-	#fc = crunchbase.Funding_Check( 2000000, 2000000 )
-	dc = crunchbase.Date_Check( d )
-	#['new york', 'new york city', 'france', 'sweden', 'finland', 'spain']
-	lc = crunchbase.Location_Check( ['new york', 'new york city' ] )
+def cb_recent( startups, max_pages ):	
 	for page in range( 1, max_pages + 1):
-		crunchbase.recent_funding_rounds( startups, [ dc, lc ], "http://www.crunchbase.com/funding-rounds?page=%s" % page )
+		crunchbase.recent_startups( startups, "http://www.crunchbase.com/funding-rounds?page=%s" % page )
 	return startups
 
 
-def ph_recent( startups, d, max_pages ):	
-	#locations = [ 1664, 1842, 2320, 1870, 1853 ]
-	locations = [ 1664 ]
-	lc = angel_list.Location_Check( locations )
+def ph_recent( startups, max_pages ):	
 	for page in range( 1, max_pages + 1):
-		product_hunt.recent_hunts( startups, [ lc ], "http://www.producthunt.com/?page=%s" % page )
+		product_hunt.recent_hunts( startups, "http://www.producthunt.com/?page=%s" % page )
 	return startups
 
 def recent():
 	startups = []
-	days_ago=7
 	max_pages = 5
-	d = datetime.datetime.today() - datetime.timedelta( days=days_ago )
 
-	cb_recent( startups, d, max_pages )
-	al_recent( startups, d, max_pages )
-	ph_recent( startups, d, max_pages )
+	cb_recent( startups, max_pages )
+	#al_recent( startups, max_pages )
+	#ph_recent( startups, max_pages )
 
+	nyc_check = bot_utils.And_Check( bot_utils.Property_Check( "location", [ 'New York', 'New York City' ] ),
+									 bot_utils.Num_Property_Check( "quality", 3, 1000, True ) )
+	
+	tags = [ 'artificial intelligence', 
+			 'big data', 'big data analytics', 'predictive analytics', 
+			 'bitcoin', 'payments', 'fintech', 'finance technology'
+			 'connected cars', 'hardware', 'iot', 'connected home', 'internet of things', 'wearable', 'wearables','connected device', 'connected devices', 'robotics'
+			 'e-commerce', 
+			 'saas', 'infrastructure', 'cloud', 'enterprise software', 'search' ]
+	tc = bot_utils.Property_Check( "tags", tags )
+	fc = bot_utils.Num_Property_Check( "total_funding", 200000, 2000000 )
+	tag_and_funding_check = bot_utils.And_Check( fc, tc )
+	
+	europe_and_funding_check = bot_utils.And_Check( fc, bot_utils.Property_Check( "location", 
+				[ 'Paris', 'Stockholm', 'Helsinki', 'Berlin', 'Dublin', 'Ljubljana' ] ) )
+
+	checks = [ nyc_check, tag_and_funding_check,  europe_and_funding_check ]
+	return [ startup for startup in startups if bot_utils.match_one( startup, checks ) ]
+
+def unique_tags( startups ):
+	ut = set()
 	for startup in startups:
-		crunchbase.total_funding( startup )
-		crunchbase.last_round( startup )
-
-	return startups
+		tags = startup.get( "tags" )
+		for t in tags:
+			ut.add( t )
+	print ( sorted( ut ) )
 
 startups = recent()
 
 results = "<html><body>%s</body></html>" % to_html( startups )
-send_email( 'alex.iskold@techstars.com', [ 'alex.iskold@techstars.com', 'kj.singh@techstars.com'], results )
 
 f = open('t.html', 'w')
 f.write( results )
