@@ -12,6 +12,10 @@ def recent_startups( startups, url, max=1000 ):
 	print( "Crunchbase.recent_startups => %s" % url ) 
 
 	names = bot_utils.find_names( url, '<h4><a href="/organization/', '"', {} )
+	# HACK: CB returns template: instead of actual page for pages 2-4
+	if len( names ) == 0:
+		names = bot_utils.find_names( url, 'u003Ca href=\\"/organization/', '\\"', {} )
+	
 	count = 0
 	for name in names:
 		startup = {}
@@ -46,11 +50,14 @@ def fill( startup, cb_data, name ):
 		bot_utils.set_if_empty( startup, "short_description", property( startup, "short_description" ) )
 		bot_utils.set_if_empty( startup, "description", property( startup, "description" ) )
 		bot_utils.set_if_empty( startup, "url", property( startup, "homepage_url" ) )
-		startup[ "crunchbase_url" ] = base_web + "location/" + name
+		startup[ "crunchbase_url" ] = base_web + "organization/" + name.lower().replace( " ", "-" )
 		bot_utils.set_if_empty( startup, "location", location( startup )  )
 		bot_utils.append_values( startup, "tags", tags( startup ) )
 		bot_utils.set_if_empty( startup, "total_funding", property( startup, "total_funding_usd" ) )
-		
+		updated = property( startup, "updated_at" )
+		updated = datetime.datetime.fromtimestamp( int( updated ) )
+		updated = updated.replace(hour=0, minute=0, second=0, microsecond=0)
+		bot_utils.set_if_empty( startup, "updated",  updated )
 		last_round( startup )
 	return startup
 

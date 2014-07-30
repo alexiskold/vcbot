@@ -1,5 +1,6 @@
 import json
 import datetime
+import time
 import locale
 import angel_list
 import crunchbase
@@ -13,6 +14,7 @@ def to_html( startups ):
 	c = 0
 	html = ""
 
+	# Ehh.... its diff on 2 computers
 	try:
 		locale.setlocale(locale.LC_ALL, 'en_US.utf8' )
 	except:
@@ -25,8 +27,9 @@ def to_html( startups ):
 		hc = startup.get( "short_description" )
 		url = startup.get( "url" )
 		loc = startup.get( "location" )
+		updated = startup.get( "updated" ).strftime( '%m-%d-%Y')
 
-		html = html + "<p><b>" + str( c ) + ". %s (%s)</b><br/>%s" % ( n, loc, hc )
+		html = html + "<p><b>" + str( c ) + ". %s (%s)</b><br/>%s, updated %s" % ( n, loc, hc, updated )
 		html = html + "<br/>" + "<a href='%s' target='_blank'>URL</a>" % ( url )
 
 		aurl = startup.get( "angel_list_url" )
@@ -96,27 +99,44 @@ def recent():
 	max_pages = 5
 
 	cb_recent( startups, max_pages )
-	#al_recent( startups, max_pages )
-	#ph_recent( startups, max_pages )
+	al_recent( startups, max_pages )
+	ph_recent( startups, max_pages )
 
-	nyc_check = bot_utils.And_Check( bot_utils.Property_Check( "location", [ 'New York', 'New York City' ] ),
-									 bot_utils.Num_Property_Check( "quality", 3, 1000, True ) )
 	
-	tags = [ 'artificial intelligence', 
-			 'big data', 'big data analytics', 'predictive analytics', 
-			 'bitcoin', 'payments', 'fintech', 'finance technology'
-			 'connected cars', 'hardware', 'iot', 'connected home', 'internet of things', 'wearable', 'wearables','connected device', 'connected devices', 'robotics'
-			 'e-commerce', 
-			 'saas', 'infrastructure', 'cloud', 'enterprise software', 'search' ]
-	tc = bot_utils.Property_Check( "tags", tags )
+	# In NYC looking for seed opps but also seeing everything that gets funded
+	fc = bot_utils.Num_Property_Check( "total_funding", 50000, 100000000 )
+	qc = bot_utils.Num_Property_Check( "quality", 3, 1000 )
+	funding_or_quality = bot_utils.Or_Check( fc, qc )
+
+	nyc_check = bot_utils.And_Check( 
+				bot_utils.Property_Check( "location", [ 'New York', 'New York City' ] ), 
+				funding_or_quality )
+
+
+	# In other places, only looking for seed opportunities
 	fc = bot_utils.Num_Property_Check( "total_funding", 200000, 2000000 )
-	tag_and_funding_check = bot_utils.And_Check( fc, tc )
+	funding_or_quality = bot_utils.Or_Check( fc, qc )
+
+
+	tags = [ 'artificial intelligence', 'machine learning', 
+			 'analytics', 'big data', 'big data analytics', 'predictive analytics', 
+			 'bitcoin', 'payments', 'fintech', 'finance technology', 'cryptocurrency', 'digital currency', 
+			 'connected cars', 'hardware', 'iot', 'connected home', 'internet of things', 'wearable', 'wearables','connected device', 'connected devices', 'robotics', '3d printing', '3d printing technology', 'home automation',
+			 'e-commerce', 'fashion tech', 'advertising'
+			 'logistics', 'sharing economy', 'logistics software', 'collaborative consumption',
+			 'saas', 'infrastructure', 'cloud', 'enterprise software', 'search', 'enterprise security', 'security', 'b2b', 'cloud management', 'cloud computing' ]
+
+	tc = bot_utils.Property_Check( "tags", tags )
 	
-	europe_and_funding_check = bot_utils.And_Check( fc, bot_utils.Property_Check( "location", 
+	tag_check = bot_utils.And_Check( funding_or_quality, tc )
+	
+	europe_check = bot_utils.And_Check( funding_or_quality, bot_utils.Property_Check( "location", 
 				[ 'Paris', 'Stockholm', 'Helsinki', 'Berlin', 'Dublin', 'Ljubljana' ] ) )
 
-	checks = [ nyc_check, tag_and_funding_check,  europe_and_funding_check ]
-	return [ startup for startup in startups if bot_utils.match_one( startup, checks ) ]
+	checks = [ nyc_check, tag_check,  europe_check ]
+	startups = [ startup for startup in startups if bot_utils.match_one( startup, checks ) ]
+
+	return sorted( startups, key=sort_helper )
 
 def unique_tags( startups ):
 	ut = set()
@@ -126,6 +146,10 @@ def unique_tags( startups ):
 			ut.add( t )
 	print ( sorted( ut ) )
 
+def sort_helper( startup ):
+	d = startup.get( "updated" )
+	return - time.mktime( d.timetuple() )
+	
 startups = recent()
 
 results = "<html><body>%s</body></html>" % to_html( startups )

@@ -24,25 +24,20 @@ def load_url( url, hdrs=None ):
 def find_names( page_url, anchor_start, anchor_stop, hdrs=None ):
 	response = load_url( page_url, hdrs )
 
-	#print( "RESPONSE: " + response )
-
 	l = len( anchor_start )
 	l2 = len( anchor_stop )
-	names = []
+	names = set()
 
 	idx_start = 0
 	while idx_start != -1:
 		idx_start = response.find( anchor_start, idx_start )
 		if idx_start != -1:
-
-			print( "FOUND MATCH " + anchor_start )			
-
 			idx_end = response.find( anchor_stop, idx_start + l )
 			name = response[ idx_start + l : idx_end ]
 			idx_start = idx_end + l2
-			names.append( name )
+			names.add( name )
 
-	return names
+	return list( names )
 
 def match_all( data, checks ):
 	for check in checks:
@@ -106,6 +101,23 @@ class And_Check:
 			if check.match( startup ) is False:
 				return False
 		return True
+
+class Or_Check:
+
+	def __init__( self ):
+		self.checks = []
+
+	def __init__( self, check1, check2 ):
+		self.checks = [ check1, check2 ]
+
+	def add_check( check ):
+		self.checks.append( check )
+
+	def match( self, startup ):
+		for check in self.checks:
+			if check.match( startup ):
+				return True
+		return False
 
 class Num_Property_Check:
 

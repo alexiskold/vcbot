@@ -89,6 +89,12 @@ def create( al_data ):
 	startup[ "angel_list_url" ] = property( al_data, "angellist_url" )
 	startup[ "location" ] = location( al_data )
 	startup[ "tags" ] = tags( al_data )
+	startup[ "quality" ] = property( al_data, "quality" )
+
+	updated = property( al_data, "updated_at" )
+	bot_utils.set_if_empty( startup, "updated",  
+		datetime.datetime.strptime( updated, '%Y-%m-%dT%H:%M:%SZ').replace(hour=0, minute=0, second=0, microsecond=0 ) )
+
 	return startup
 	
 def property( startup, prop ):
