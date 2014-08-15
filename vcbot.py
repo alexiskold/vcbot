@@ -102,7 +102,6 @@ def recent():
 	al_recent( startups, max_pages )
 	ph_recent( startups, max_pages )
 
-	
 	# In NYC looking for seed opps but also seeing everything that gets funded
 	fc = bot_utils.Num_Property_Check( "total_funding", 50000, 100000000 )
 	qc = bot_utils.Num_Property_Check( "quality", 3, 1000 )
@@ -138,6 +137,7 @@ def recent():
 
 	return sorted( startups, key=sort_helper )
 
+
 def unique_tags( startups ):
 	ut = set()
 	for startup in startups:
@@ -153,6 +153,8 @@ def sort_helper( startup ):
 startups = recent()
 
 results = "<html><body>%s</body></html>" % to_html( startups )
+
+send_email( 'alex.iskold@techstars.com', ['alex.iskold@techstars.com', 'kj.singh@techstars.com'], results )
 
 f = open('t.html', 'w')
 f.write( results )

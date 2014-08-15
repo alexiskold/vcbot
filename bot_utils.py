@@ -15,10 +15,14 @@ def load_json( url ):
 	return results
 
 def load_url( url, hdrs=None ):
-	request = urllib.request.Request( url, headers=hdrs )
-	url_request = urllib.request.urlopen( request );
-	response = str( url_request.read(), encoding='utf8' )
-	url_request.close()
+	response = ""
+	try:
+		request = urllib.request.Request( url, headers=hdrs )
+		url_request = urllib.request.urlopen( request );
+		response = str( url_request.read(), encoding='utf8' )
+		url_request.close()
+	except:
+		print( "Can't load: " + url )	
 	return response
 
 def find_names( page_url, anchor_start, anchor_stop, hdrs=None ):
