@@ -103,14 +103,13 @@ def recent():
 	ph_recent( startups, max_pages )
 
 	# In NYC looking for seed opps but also seeing everything that gets funded
-	fc = bot_utils.Num_Property_Check( "total_funding", 50000, 100000000 )
-	qc = bot_utils.Num_Property_Check( "quality", 3, 1000 )
+	fc = bot_utils.Num_Property_Check( "total_funding", 0, 100000000 )
+	qc = bot_utils.Num_Property_Check( "quality", 0, 1000 )
 	funding_or_quality = bot_utils.Or_Check( fc, qc )
 
 	nyc_check = bot_utils.And_Check( 
 				bot_utils.Property_Check( "location", [ 'New York', 'New York City' ] ), 
 				funding_or_quality )
-
 
 	# In other places, only looking for seed opportunities
 	fc = bot_utils.Num_Property_Check( "total_funding", 200000, 2000000 )
