@@ -12,7 +12,7 @@ def adjust_path( name ):
 		return name[0:idx].strip()
 	return name
 
-def recent_hunts( startups, url, max=1000 ):
+def recent_hunts( startup_map, url, max=1000 ):
 
 	print( "Product Hunt.recent_hunts => %s" % url ) 
 
@@ -20,18 +20,19 @@ def recent_hunts( startups, url, max=1000 ):
 	posts = ph_data.get( "posts" )
 	count = 0
 	for post in posts:
-		name = post.get( "name")
-		startup = angel_list.find_startup( urllib.request.pathname2url( adjust_path( name ) ) )
-		if startup is not None:
-			startups.append( startup )
-			startup[ "product_hunt_url" ] = post.get( "discussion_url" )
-			startup[ "product_hunt_votes" ] = post.get( "votes_count" )
-			startup[ "product_hunt_comments" ] = post.get( "comments_count" )
-			startup[ "updated" ] = datetime.datetime.strptime( post.get( "day" ), '%Y-%m-%d' )
-			print( "Found via PH: " + name )
-			count = count + 1
-			if count > max:
-				break
-	return startups
+		name = post.get( "name" )
+		if startup_map.get( name ) is None:
+			startup = angel_list.find_startup( urllib.request.pathname2url( adjust_path( name ) ) )
+			if startup is not None:
+				startup_map[ name ] = startup
+				startup[ "product_hunt_url" ] = post.get( "discussion_url" )
+				startup[ "product_hunt_votes" ] = post.get( "votes_count" )
+				startup[ "product_hunt_comments" ] = post.get( "comments_count" )
+				startup[ "updated" ] = datetime.datetime.strptime( post.get( "day" ), '%Y-%m-%d' )
+				print( "Found via PH: " + name )
+				count = count + 1
+				if count > max:
+					break
+	return startup_map
 
 

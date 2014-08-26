@@ -41,7 +41,7 @@ class Startup_Check:
 
 al_checks = [ Startup_Check(), Key_Attr_Check( [ "name", "high_concept", "company_url" ] ) ]
 
-def recent_startups( startups, url, max=1000 ):
+def recent_startups( startup_map, url, max=1000 ):
 
 	print( "AngelList.recent_startups => %s" % url ) 
 	results = bot_utils.load_json( url )
@@ -51,14 +51,15 @@ def recent_startups( startups, url, max=1000 ):
 		for al_data in results.get( "startups" ):
 			if bot_utils.match_all( al_data, al_checks ):
 				name = al_data.get( "name" );
-				startup = create( al_data )
-				crunchbase.find_startup( startup, name )
-				startups.append( startup )
-				print( "Found via AL: " + name )
-				count = count + 1
-				if count > max:
-					break
-	return startups;
+				if startup_map.get( name ) is None:
+					startup = create( al_data )
+					startup_map[ name ] = startup
+					crunchbase.find_startup( startup, name )
+					print( "Found via AL: " + name )
+					count = count + 1
+					if count > max:
+						break
+	return startup_map;
 
 def find_startup( name ):
 	url = "https://api.angel.co/1/search?type=Startup&query=%s" % name

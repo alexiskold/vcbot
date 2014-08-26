@@ -8,7 +8,7 @@ base_api = "http://api.crunchbase.com/v/2/"
 base_web = "http://www.crunchbase.com/"
 funding_web = base_web + "funding-round/"
 
-def recent_startups( startups, url, max=1000 ):
+def recent_startups( startup_map, url, max=1000 ):
 	print( "Crunchbase.recent_startups => %s" % url ) 
 
 	names = bot_utils.find_names( url, '<h4><a href="/organization/', '"', {} )
@@ -19,13 +19,13 @@ def recent_startups( startups, url, max=1000 ):
 	count = 0
 	for name in names:
 		startup = {}
-		if find_startup( startup, name ):
-			startups.append( startup )
-			print( "Found via CB: " + name )
-			count = count + 1
-			if count > max:
-				break
-	return startups
+		if startup_map.get( name ) is None and find_startup( startup, name ):
+				startup_map[ name ] = startup
+				print( "Found via CB: " + name )
+				count = count + 1
+				if count > max:
+					break
+	return startup_map
 
 def find_startup( startup, name ):
 	if startup.get( "cb_data" ) is not None:

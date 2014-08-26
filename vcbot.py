@@ -101,16 +101,15 @@ def cb_recent( startups, max_pages ):
 
 def ph_recent( startups, max_pages ):	
 	for page in range( 0, max_pages ):
-		#product_hunt.recent_hunts( startups, "http://www.producthunt.com/?page=%s" % page )
 		product_hunt.recent_hunts( startups, "https://api.producthunt.com/v1/posts?days_ago=%s" % page )
 	return startups
 
 def recent( max_pages, al_location_ids, primary_locations, secondary_locations, tags ):
-	startups = []
+	startup_map = {}
 
-	cb_recent( startups, max_pages )
-	al_recent( startups, max_pages, al_location_ids )
-	ph_recent( startups, max_pages )
+	cb_recent( startup_map, max_pages )
+	al_recent( startup_map, max_pages, al_location_ids )
+	ph_recent( startup_map, max_pages )
 
 	# In primary location criteria is looser 
 	fc = bot_utils.Num_Property_Check( "total_funding", 0, 3000000 )
@@ -132,39 +131,11 @@ def recent( max_pages, al_location_ids, primary_locations, secondary_locations, 
 	
 	checks = [ primary_location_check, secondary_location_check, tag_check ]
 
+	startups = startup_map.values()
 	startups = [ startup for startup in startups if bot_utils.match_one( startup, checks ) ]
 
 	return sorted( startups, key=sort_helper )
 
-def recent_London():
-	startups = []
-	max_pages = 5
-
-	cb_recent( startups, max_pages )
-	al_recent( startups, max_pages, [ 1695, 151103, 151943, 155674, 152982, 151101, 156659 ] )
-	ph_recent( startups, max_pages )
-
-	# In NYC looking for seed opps but also seeing everything that gets funded
-	fc = bot_utils.Num_Property_Check( "total_funding", 50000, 2000000 )
-	qc = bot_utils.Num_Property_Check( "quality", 2, 1000 )
-	funding_or_quality = bot_utils.Or_Check( fc, qc )
-
-	city_check = bot_utils.And_Check( bot_utils.Property_Check( "location", [ 'London', 'UK', 'England', 'United Kingdom', 'Grb',
-														 'Paris', 'France', 'Fra',
-														 'Stockholm', 'Sweden', 'Swe'
-														 'Helsinki', 'Finland', 'Fin' ] ),
-									 funding_or_quality )
-
-
-	tags = [ 'saas', 'infrastructure', 'cloud', 'enterprise software', 'search', 'enterprise security', 'security', 'b2b', 'cloud management', 'cloud computing', 'analytics', 'big data', 'big data analytics', 'predictive analytics', 
-			 'bitcoin', 'payments', 'fintech', 'finance technology', 'cryptocurrency', 'digital currency' ]
-
-	tag_check = bot_utils.Property_Check( "tags", tags )
-	
-	checks = [ city_check ]
-	startups = [ startup for startup in startups if bot_utils.match_one( startup, checks ) ]
-
-	return sorted( startups, key=sort_helper )
 
 def unique_tags( startups ):
 	ut = set()
@@ -182,7 +153,8 @@ max_pages = 5
 al_location_ids = [ 1664, 2071, 2078, 151731, 151642 ]
 
 primary_locations = [ 'new york', 'new york city', 'nyc', 'brooklyn', 'new york, new york', 'brooklyn, new york', 'new york, ny', ]
-secondary_locations = [ 'london', 'uk', 'england', 'united kingdom', 'grb',
+secondary_locations = [ 'los angeles',
+						'london', 'uk', 'england', 'united kingdom', 'grb',
 						'paris', 'france', 'fra', 'paris, france', 
 						'stockholm', 'swe', 'sweden', 'helsinki', 'finland', 'fin'
 						'spain', 'spa', 'madrid', 'barcelona' ]
