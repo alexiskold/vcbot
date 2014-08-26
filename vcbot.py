@@ -41,6 +41,12 @@ def to_html( startups ):
 		cburl = startup.get( "crunchbase_url" )
 		if cburl is not None:
 			html = html + "  |  <a href='%s' target='_blank'>CrunchBase</a>" % ( str( cburl ) )		
+
+		phurl = startup.get( "product_hunt_url" )
+		if phurl is not None:
+			v = str( startup.get( "product_hunt_votes" ) )
+			cm = str( startup.get( "product_hunt_comments" ) )
+			html = html + "  |  <a href='%s' target='_blank'>ProductHunt (v=%s, c=%s)</a>" % ( str( phurl ), v, cm )
 		
 		total_funding = startup.get( "total_funding" )
 		if total_funding is not None and total_funding != 0 :
@@ -48,10 +54,15 @@ def to_html( startups ):
 
 		last_round = startup.get( "last_round" )
 		if last_round is not None:
-			html = html + '   <a href="%s">%s: %s</a>' % ( 
-				str( startup.get( "crunchbase_last_round_url" ) ),
-				str( startup.get( "last_round_type" ) ),
+			round_str = "%s: %s" % ( str( startup.get( "last_round_type" ) ),
 				str( locale.currency( last_round, grouping=True ) )[:-3] )
+
+			last_round_url = startup.get( "last_round_url" )
+			if last_round_url is not None and len( last_round_url ) > 0:
+				html = html + ('   <a href="%s">%s</a>' % 
+							     ( str( startup.get( "last_round_url" ) ), round_str ) )
+			else:					
+				html = html + '   %s' % round_str
 
 		tags = startup.get( "tags" )
 		if len( tags ) != 0:
@@ -71,8 +82,7 @@ def send_email( sender, addresses, content ):
 	s.sendmail( sender, addresses, msg.as_string() )
 	s.quit()
 
-def al_recent( startups, max_pages ):
-	locations = [ 1664 ]
+def al_recent( startups, max_pages, locations ):
 
 	for page in range( 1, max_pages + 1):
 		angel_list.recent_startups( startups, "https://api.angel.co/1/startups?filter=raising&page=%s" % page )
@@ -90,52 +100,71 @@ def cb_recent( startups, max_pages ):
 
 
 def ph_recent( startups, max_pages ):	
-	for page in range( 1, max_pages + 1):
-		product_hunt.recent_hunts( startups, "http://www.producthunt.com/?page=%s" % page )
+	for page in range( 0, max_pages ):
+		#product_hunt.recent_hunts( startups, "http://www.producthunt.com/?page=%s" % page )
+		product_hunt.recent_hunts( startups, "https://api.producthunt.com/v1/posts?days_ago=%s" % page )
 	return startups
 
-def recent():
+def recent( max_pages, al_location_ids, primary_locations, secondary_locations, tags ):
 	startups = []
-	max_pages = 5
 
-	cb_recent( startups, max_pages )
-	al_recent( startups, max_pages )
+	#cb_recent( startups, max_pages )
+	#al_recent( startups, max_pages, al_location_ids )
 	ph_recent( startups, max_pages )
 
-	# In NYC looking for seed opps but also seeing everything that gets funded
-	fc = bot_utils.Num_Property_Check( "total_funding", 0, 100000000 )
+	# In primary location criteria is looser 
+	fc = bot_utils.Num_Property_Check( "total_funding", 0, 3000000 )
 	qc = bot_utils.Num_Property_Check( "quality", 0, 1000 )
 	funding_or_quality = bot_utils.Or_Check( fc, qc )
 
-	nyc_check = bot_utils.And_Check( 
-				bot_utils.Property_Check( "location", [ 'New York', 'New York City' ] ), 
-				funding_or_quality )
+	primary_location_check = bot_utils.And_Check( funding_or_quality,
+				bot_utils.Property_Check( "location", primary_locations ) )
 
-	# In other places, only looking for seed opportunities
-	fc = bot_utils.Num_Property_Check( "total_funding", 200000, 2000000 )
-	funding_or_quality = bot_utils.Or_Check( fc, qc )
+	# In secondary locations, have min funding 
+	fc = bot_utils.Num_Property_Check( "total_funding", 50000, 3000000 )
 
-
-	tags = [ 'artificial intelligence', 'machine learning', 
-			 'analytics', 'big data', 'big data analytics', 'predictive analytics', 
-			 'bitcoin', 'payments', 'fintech', 'finance technology', 'cryptocurrency', 'digital currency', 
-			 'connected cars', 'hardware', 'iot', 'connected home', 'internet of things', 'wearable', 'wearables','connected device', 'connected devices', 'robotics', '3d printing', '3d printing technology', 'home automation',
-			 'e-commerce', 'fashion tech', 'advertising'
-			 'logistics', 'sharing economy', 'logistics software', 'collaborative consumption',
-			 'saas', 'infrastructure', 'cloud', 'enterprise software', 'search', 'enterprise security', 'security', 'b2b', 'cloud management', 'cloud computing' ]
+	secondary_location_check = bot_utils.And_Check( fc,
+				bot_utils.Property_Check( "location", secondary_locations ) )
 
 	tc = bot_utils.Property_Check( "tags", tags )
 	
-	tag_check = bot_utils.And_Check( funding_or_quality, tc )
+	tag_check = bot_utils.And_Check( fc, tc )
 	
-	europe_check = bot_utils.And_Check( funding_or_quality, bot_utils.Property_Check( "location", 
-				[ 'Paris', 'Stockholm', 'Helsinki', 'Berlin', 'Dublin', 'Ljubljana' ] ) )
+	checks = [ primary_location_check, secondary_location_check, tag_check ]
 
-	checks = [ nyc_check, tag_check,  europe_check ]
 	startups = [ startup for startup in startups if bot_utils.match_one( startup, checks ) ]
 
 	return sorted( startups, key=sort_helper )
 
+def recent_London():
+	startups = []
+	max_pages = 5
+
+	cb_recent( startups, max_pages )
+	al_recent( startups, max_pages, [ 1695, 151103, 151943, 155674, 152982, 151101, 156659 ] )
+	ph_recent( startups, max_pages )
+
+	# In NYC looking for seed opps but also seeing everything that gets funded
+	fc = bot_utils.Num_Property_Check( "total_funding", 50000, 2000000 )
+	qc = bot_utils.Num_Property_Check( "quality", 2, 1000 )
+	funding_or_quality = bot_utils.Or_Check( fc, qc )
+
+	city_check = bot_utils.And_Check( bot_utils.Property_Check( "location", [ 'London', 'UK', 'England', 'United Kingdom', 'Grb',
+														 'Paris', 'France', 'Fra',
+														 'Stockholm', 'Sweden', 'Swe'
+														 'Helsinki', 'Finland', 'Fin' ] ),
+									 funding_or_quality )
+
+
+	tags = [ 'saas', 'infrastructure', 'cloud', 'enterprise software', 'search', 'enterprise security', 'security', 'b2b', 'cloud management', 'cloud computing', 'analytics', 'big data', 'big data analytics', 'predictive analytics', 
+			 'bitcoin', 'payments', 'fintech', 'finance technology', 'cryptocurrency', 'digital currency' ]
+
+	tag_check = bot_utils.Property_Check( "tags", tags )
+	
+	checks = [ city_check ]
+	startups = [ startup for startup in startups if bot_utils.match_one( startup, checks ) ]
+
+	return sorted( startups, key=sort_helper )
 
 def unique_tags( startups ):
 	ut = set()
@@ -149,11 +178,30 @@ def sort_helper( startup ):
 	d = startup.get( "updated" )
 	return - time.mktime( d.timetuple() )
 	
-startups = recent()
+max_pages = 1
+al_location_ids = [ 1664, 2071, 2078, 151731, 151642 ]
+
+primary_locations = [ 'new york', 'new york city', 'nyc', 'brooklyn', 'new york, new york', 'brooklyn, new york', 'new york, ny', ]
+secondary_locations = [ 'london', 'uk', 'england', 'united kingdom', 'grb',
+						'paris', 'france', 'fra', 'paris, france', 
+						'stockholm', 'swe', 'sweden', 'helsinki', 'finland', 'fin'
+						'spain', 'spa', 'madrid', 'barcelona' ]
+
+tags = [ 'artificial intelligence', 'machine learning', 
+			 'analytics', 'big data', 'big data analytics', 'predictive analytics', 
+			 'bitcoin', 'payments', 'fintech', 'finance technology', 'cryptocurrency', 'digital currency', 
+			 'connected cars', 'hardware', 'iot', 'connected home', 'internet of things', 'wearable', 'wearables','connected device', 'connected devices', 'robotics', '3d printing', '3d printing technology', 'home automation',
+			 'e-commerce', 'fashion tech', 'advertising'
+			 'logistics', 'sharing economy', 'logistics software', 'collaborative consumption',
+			 'saas', 'infrastructure', 'cloud', 'enterprise software', 'search', 'enterprise security', 'security', 'b2b', 'cloud management', 'cloud computing' ]
+
+
+
+startups = recent( max_pages, al_location_ids, primary_locations, secondary_locations, tags )
 
 results = "<html><body>%s</body></html>" % to_html( startups )
 
-send_email( 'alex.iskold@techstars.com', ['alex.iskold@techstars.com', 'kj.singh@techstars.com'], results )
+#send_email( 'alex.iskold@techstars.com', ['alex.iskold@techstars.com', 'kj.singh@techstars.com'], results )
 
 f = open('t.html', 'w')
 f.write( results )

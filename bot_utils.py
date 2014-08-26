@@ -1,6 +1,7 @@
 
 import urllib
 import urllib.request
+import datetime
 import json
 
 def load_json( url ):
@@ -70,11 +71,15 @@ def append_values( data, prop, values ):
 	else:
 		data[ prop ] = values
 
+def create_date( str ):
+	updated = datetime.datetime.fromtimestamp( int( str ) )
+	return updated.replace(hour=0, minute=0, second=0, microsecond=0)
+
 class Property_Check:
 
 	def __init__( self, property, values ):
 		self.property = property
-		self.values = values
+		self.values = [ x.lower() for x in values ]
 
 	def match( self, startup ):
 		value = startup.get( self.property )
@@ -83,11 +88,11 @@ class Property_Check:
 
 		if isinstance( value, list ):
 			for v in value:
-				if v in self.values:
+				if v.lower() in self.values:
 					return True
 			return False
 		else:
-			return value in self.values
+			return value.lower() in self.values
 
 class And_Check:
 
@@ -137,20 +142,5 @@ class Num_Property_Check:
 			return self.allow_empty
 
 		return value >= self.min_value and value < self.max_value
-
-class Date_Check:
-
-	def __init__( self, stop_date ):
-		self.stop_date = stop_date
-
-	def match( self, startup ):
-		round = last_round( startup )
-		if round is not None:
-			d = property( round, "updated_at" )
-
-			if datetime.datetime.fromtimestamp( d ) > self.stop_date:
-				return True
-		return False
-
 
 

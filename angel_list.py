@@ -39,7 +39,7 @@ class Startup_Check:
 		return m
 
 
-al_checks = [ Startup_Check(), Key_Attr_Check( [ "name", "high_concept", "product_desc", "company_url" ] ) ]
+al_checks = [ Startup_Check(), Key_Attr_Check( [ "name", "high_concept", "company_url" ] ) ]
 
 def recent_startups( startups, url, max=1000 ):
 
@@ -95,6 +95,8 @@ def create( al_data ):
 	bot_utils.set_if_empty( startup, "updated",  
 		datetime.datetime.strptime( updated, '%Y-%m-%dT%H:%M:%SZ').replace(hour=0, minute=0, second=0, microsecond=0 ) )
 
+	funding( startup )
+
 	return startup
 	
 def property( startup, prop ):
@@ -121,4 +123,30 @@ def tags( al_data ):
 		for market in markets:
 			tags.append( market.get( "name").lower() )
 	return tags
+
+def funding( startup ):
+	if startup.get( "last_round" ) is None:
+		al_data = startup[ 'al_data' ]
+		al_id = property( al_data, 'id' )
+		al_funding = bot_utils.load_json( "https://api.angel.co/1/startups/%s/funding" % al_id )
+		if al_funding is not None:
+			funding_info = al_funding.get( "funding" )
+			total_raised = 0
+			last_round = None
+
+			for funding in funding_info:
+				amount = property( funding, "amount" )
+
+				if amount is not None:					
+					closed = property( funding, "closed_at" )
+				
+					total_raised = total_raised + amount
+					if last_round is None or closed > last_round.get( "closed_at" ):
+						last_round = funding
+
+			if last_round is not None:
+				bot_utils.set_if_empty( startup, "last_round", last_round.get( "amount" ) )
+				bot_utils.set_if_empty( startup, "last_round_type", last_round.get( "round_type" ) )
+				bot_utils.set_if_empty( startup, "last_round_url", last_round.get( "source_url" ) )
+				bot_utils.set_if_empty( startup, "total_funding", total_raised )
 

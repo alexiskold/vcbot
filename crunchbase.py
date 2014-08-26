@@ -55,24 +55,23 @@ def fill( startup, cb_data, name ):
 		bot_utils.append_values( startup, "tags", tags( startup ) )
 		bot_utils.set_if_empty( startup, "total_funding", property( startup, "total_funding_usd" ) )
 		updated = property( startup, "updated_at" )
-		updated = datetime.datetime.fromtimestamp( int( updated ) )
-		updated = updated.replace(hour=0, minute=0, second=0, microsecond=0)
+		updated = bot_utils.create_date( updated )
 		bot_utils.set_if_empty( startup, "updated",  updated )
 		last_round( startup )
+
 	return startup
 
 def last_round( startup ):
-	if startup.get( "cb_last_round" ) is None:
+	if startup.get( "last_round" ) is None:
 		rounds = relationship( startup, "funding_rounds" ) 
 		if rounds is not None:
 			round = rounds[0]
 			url = authenticate( "http://api.crunchbase.com/v/2/" + round.get( "path" ) )
 			last_round_data = bot_utils.load_json( url )
 			startup[ "cb_last_round" ] = last_round_data
-			startup[ "last_round"] = property( startup, "money_raised_usd", "cb_last_round" )
-			startup[ "last_round_type"] = property( startup, "funding_type", "cb_last_round" )
-			startup[ "crunchbase_last_round_url"] = funding_web + property( startup, "permalink", "cb_last_round" )
-	return startup.get( "cb_last_round" )
+			bot_utils.set_if_empty( startup, "last_round", property( startup, "money_raised_usd", "cb_last_round" ) )
+			bot_utils.set_if_empty( startup, "last_round_type", property( startup, "funding_type", "cb_last_round" ) )
+			bot_utils.set_if_empty( startup, "last_round_url", funding_web + property( startup, "permalink", "cb_last_round" ) )
 
 def authenticate( url ):
 	return url + "?user_key=965fd081754ede59027768df720f3bf1"
