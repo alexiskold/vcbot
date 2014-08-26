@@ -36,7 +36,7 @@ def find_startup( startup, name ):
 	cb_data = bot_utils.load_json( url )
 	if cb_data is not None:
 		response = cb_data.get( "data" ).get( "response" )
-		if response is not False:
+		if response is not False and cb_data.get( "data" ).get( "properties" ).get( "primary_role" ) == 'company':
 			fill( startup, cb_data, name )			
 			return True
 

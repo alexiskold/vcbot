@@ -108,8 +108,8 @@ def ph_recent( startups, max_pages ):
 def recent( max_pages, al_location_ids, primary_locations, secondary_locations, tags ):
 	startups = []
 
-	#cb_recent( startups, max_pages )
-	#al_recent( startups, max_pages, al_location_ids )
+	cb_recent( startups, max_pages )
+	al_recent( startups, max_pages, al_location_ids )
 	ph_recent( startups, max_pages )
 
 	# In primary location criteria is looser 
@@ -178,7 +178,7 @@ def sort_helper( startup ):
 	d = startup.get( "updated" )
 	return - time.mktime( d.timetuple() )
 	
-max_pages = 1
+max_pages = 5
 al_location_ids = [ 1664, 2071, 2078, 151731, 151642 ]
 
 primary_locations = [ 'new york', 'new york city', 'nyc', 'brooklyn', 'new york, new york', 'brooklyn, new york', 'new york, ny', ]
@@ -201,7 +201,7 @@ startups = recent( max_pages, al_location_ids, primary_locations, secondary_loca
 
 results = "<html><body>%s</body></html>" % to_html( startups )
 
-#send_email( 'alex.iskold@techstars.com', ['alex.iskold@techstars.com', 'kj.singh@techstars.com'], results )
+send_email( 'alex.iskold@techstars.com', ['alex.iskold@techstars.com', 'kj.singh@techstars.com'], results )
 
 f = open('t.html', 'w')
 f.write( results )

@@ -1,11 +1,7 @@
 import bot_utils
-import crunchbase
 import angel_list
 import datetime
 import urllib
-
-
-ph_headers = { 'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.114 Safari/537.36' }
 
 def authenticate( url ):
 	return url + "&access_token=f9f96f658c15bddef464f6b7457884ea47c316aa42f7509206299d4f58d9aa08"
