@@ -114,3 +114,8 @@ def tags( startup ):
 	return tags
 
 
+if __name__ == "__main__":
+	startups = {}
+	recent_startups(startups, "https://www.crunchbase.com/funding-rounds", max=10)
+	print(startups)
+

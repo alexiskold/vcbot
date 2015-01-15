@@ -173,7 +173,7 @@ startups = recent( max_pages, al_location_ids, primary_locations, secondary_loca
 
 results = "<html><body>%s</body></html>" % to_html( startups )
 
-send_email( 'alex.iskold@techstars.com', ['alex.iskold@techstars.com', 'kj.singh@techstars.com'], results )
+# send_email( 'alex.iskold@techstars.com', ['alex.iskold@techstars.com', 'kj.singh@techstars.com'], results )
 
 f = open('t.html', 'w')
 f.write( results )

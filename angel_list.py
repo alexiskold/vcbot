@@ -151,3 +151,7 @@ def funding( startup ):
 				bot_utils.set_if_empty( startup, "last_round_url", last_round.get( "source_url" ) )
 				bot_utils.set_if_empty( startup, "total_funding", total_raised )
 
+if __name__ == "__main__":
+	startups = {}
+	recent_startups(startups, "https://api.angel.co/1/startups?filter=raising&page=1", 3)
+	print(startups)

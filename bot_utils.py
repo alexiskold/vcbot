@@ -3,6 +3,7 @@ import urllib
 import urllib.request
 import datetime
 import json
+import traceback
 
 def load_json( url ):
 	results = None
@@ -23,6 +24,7 @@ def load_url( url, hdrs=None ):
 		response = str( url_request.read(), encoding='utf8' )
 		url_request.close()
 	except:
+		traceback.print_exc();
 		print( "Can't load: " + url )	
 	return response
 
