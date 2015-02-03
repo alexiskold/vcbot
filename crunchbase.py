@@ -116,6 +116,6 @@ def tags( startup ):
 
 if __name__ == "__main__":
 	startups = {}
-	recent_startups(startups, "https://www.crunchbase.com/funding-rounds", max=10)
+	recent_startups(startups, "./cb_funding-rounds.html", max=10)
 	print(startups)
 

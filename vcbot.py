@@ -6,6 +6,7 @@ import angel_list
 import crunchbase
 import product_hunt
 import bot_utils
+import cb_scraping
 
 import smtplib
 from email.mime.text import MIMEText
@@ -93,9 +94,10 @@ def al_recent( startups, max_pages, locations ):
 
 	return startups
 
-def cb_recent( startups, max_pages ):	
-	for page in range( 1, max_pages + 1):
-		crunchbase.recent_startups( startups, "http://www.crunchbase.com/funding-rounds?page=%s" % page )
+def cb_recent( startups, max_pages ):
+	link = "./cb_funding-rounds.html"
+	cb_scraping.get_cb_content("http://www.crunchbase.com/funding-rounds", "./cb_funding-rounds.html")
+	crunchbase.recent_startups( startups, link)
 	return startups
 
 
