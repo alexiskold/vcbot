@@ -1,1 +1,4 @@
 *.pyc
+*.html
+*.DS_Store
+*.tags
