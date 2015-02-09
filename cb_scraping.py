@@ -27,10 +27,10 @@ def timeout_check(driver, secs, ready):
 
 def page_down(driver, times):
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    timeout(5)
+    timeout_check(driver, 5, True)
 
 
-def get_cb_content(link, output):
+def get_cb_content(link, output_page):
     try:
         driver = webdriver.Chrome()
     except WebDriverException as e:
@@ -55,7 +55,7 @@ def get_cb_content(link, output):
 
     #TI: implement console feedback
     timeout_check(driver, 20, False) #wait 20 seconds max for content
-    page_down(1) #Scroll down once
+    page_down(driver, 1) #Scroll down once
     page_html = driver.page_source
     driver.quit()
     with open(output_page, "w") as f:
@@ -63,6 +63,5 @@ def get_cb_content(link, output):
     return(page_html)
 
 if __name__ == "__main__":
-    with open("cb_funding-rounds.html", 'w') as f:
-        f.write(get_cb_content("https://www.crunchbase.com/funding-rounds"))
+    get_cb_content("https://www.crunchbase.com/funding-rounds", "cb_funding-rounds.html")
 
