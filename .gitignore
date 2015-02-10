@@ -1,10 +1,7 @@
 *.pyc
-<<<<<<< HEAD
 *.tags
 .DS_Store
 *.html
-=======
-*.html
-*.DS_Store
+*.sublime-workplace
+*.sublime-project
 *.tags
->>>>>>> debug
