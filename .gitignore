@@ -2,6 +2,6 @@
 *.tags
 .DS_Store
 *.html
-*.sublime-workplace
+*.sublime-workspace
 *.sublime-project
 *.tags
