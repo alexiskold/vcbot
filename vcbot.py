@@ -6,6 +6,7 @@ import angel_list
 import crunchbase
 import product_hunt
 import bot_utils
+import pdb
 
 import smtplib
 from email.mime.text import MIMEText
@@ -70,17 +71,17 @@ def to_html( startups ):
 
 	return html
 
-def send_email( sender, addresses, content ):
-	d = datetime.datetime.strftime( datetime.datetime.today(), "%m-%d-%Y" )
+# def send_email( sender, addresses, content ):
+# 	d = datetime.datetime.strftime( datetime.datetime.today(), "%m-%d-%Y" )
 
-	msg = MIMEText( content, 'html' )
-	msg['Subject'] = d + ': startups to review'
-	msg['From'] = sender
-	msg['To'] = ','.join(addresses)
+# 	msg = MIMEText( content, 'html' )
+# 	msg['Subject'] = d + ': startups to review'
+# 	msg['From'] = sender
+# 	msg['To'] = ','.join(addresses)
 
-	s = smtplib.SMTP('localhost')
-	s.sendmail( sender, addresses, msg.as_string() )
-	s.quit()
+# 	s = smtplib.SMTP('localhost')
+# 	s.sendmail( sender, addresses, msg.as_string() )
+# 	s.quit()
 
 def al_recent( startups, max_pages, locations ):
 
@@ -107,7 +108,7 @@ def ph_recent( startups, max_pages ):
 def recent( max_pages, al_location_ids, primary_locations, secondary_locations, tags ):
 	startup_map = {}
 
-	cb_recent( startup_map, max_pages )
+	# cb_recent( startup_map, max_pages )
 	al_recent( startup_map, max_pages, al_location_ids )
 	ph_recent( startup_map, max_pages )
 
@@ -148,36 +149,37 @@ def unique_tags( startups ):
 def sort_helper( startup ):
 	d = startup.get( "updated" )
 	return - time.mktime( d.timetuple() )
-	
-max_pages = 5
-al_location_ids = [ 1664, 2071, 2078, 151731, 151642 ]
 
-primary_locations = [ 'new york', 'new york city', 'nyc', 'brooklyn', 'new york, new york', 'brooklyn, new york', 'new york, ny', ]
-secondary_locations = [ 'los angeles',
-						'london', 'uk', 'england', 'united kingdom', 'grb',
-						'paris', 'france', 'fra', 'paris, france', 
-						'stockholm', 'swe', 'sweden', 'helsinki', 'finland', 'fin'
-						'spain', 'spa', 'madrid', 'barcelona' ]
+if __name__ == "__main__":
+	max_pages = 1
+	al_location_ids = [ 1664, 2071, 2078, 151642 ]
 
-tags = [ 'artificial intelligence', 'machine learning', 
-			 'analytics', 'big data', 'big data analytics', 'predictive analytics', 
-			 'bitcoin', 'payments', 'fintech', 'finance technology', 'cryptocurrency', 'digital currency', 
-			 'connected cars', 'hardware', 'iot', 'connected home', 'internet of things', 'wearable', 'wearables','connected device', 'connected devices', 'robotics', '3d printing', '3d printing technology', 'home automation',
-			 'e-commerce', 'fashion tech', 'advertising'
-			 'logistics', 'sharing economy', 'logistics software', 'collaborative consumption',
-			 'saas', 'infrastructure', 'cloud', 'enterprise software', 'search', 'enterprise security', 'security', 'b2b', 'cloud management', 'cloud computing' ]
+	primary_locations = [ 'new york', 'new york city', 'nyc', 'brooklyn', 'new york, new york', 'brooklyn, new york', 'new york, ny', ]
+	secondary_locations = [ 'los angeles',
+							'london', 'uk', 'england', 'united kingdom', 'grb',
+							'paris', 'france', 'fra', 'paris, france', 
+							'stockholm', 'swe', 'sweden', 'helsinki', 'finland', 'fin'
+							'spain', 'spa', 'madrid', 'barcelona' ]
+
+	tags = [ 'artificial intelligence', 'machine learning', 
+				 'analytics', 'big data', 'big data analytics', 'predictive analytics', 
+				 'bitcoin', 'payments', 'fintech', 'finance technology', 'cryptocurrency', 'digital currency', 
+				 'connected cars', 'hardware', 'iot', 'connected home', 'internet of things', 'wearable', 'wearables','connected device', 'connected devices', 'robotics', '3d printing', '3d printing technology', 'home automation',
+				 'e-commerce', 'fashion tech', 'advertising'
+				 'logistics', 'sharing economy', 'logistics software', 'collaborative consumption',
+				 'saas', 'infrastructure', 'cloud', 'enterprise software', 'search', 'enterprise security', 'security', 'b2b', 'cloud management', 'cloud computing' ]
 
 
 
-startups = recent( max_pages, al_location_ids, primary_locations, secondary_locations, tags )
+	startups = recent( max_pages, al_location_ids, primary_locations, secondary_locations, tags )
 
-results = "<html><body>%s</body></html>" % to_html( startups )
+	results = "<html><body>%s</body></html>" % to_html( startups )
 
-send_email( 'alex.iskold@techstars.com', ['alex.iskold@techstars.com', 'kj.singh@techstars.com'], results )
+	send_email( 'alex.iskold@techstars.com', ['alex.iskold@techstars.com', 'kj.singh@techstars.com'], results )
 
-f = open('t.html', 'w')
-f.write( results )
-f.close()
+	f = open('t.html', 'w')
+	f.write( results )
+	f.close()
 
 
 

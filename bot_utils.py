@@ -1,17 +1,18 @@
 
 import urllib
 import urllib.request
+import requests
 import datetime
 import json
 
 def load_json( url ):
 	results = None
 	try:
-		request  = urllib.request.urlopen( url )
-		response = request.read()
-		results = json.loads( response.decode('utf8') )
-		request.close()
-	except:
+		response = requests.get( url )
+		results = response.json()
+	except Exception as e:
+		print("Url: {0}".format(url))
+		print("Error: {0}".format(e))
 		print( "Can't load: " + url )	
 	return results
 
@@ -143,4 +144,7 @@ class Num_Property_Check:
 
 		return value >= self.min_value and value < self.max_value
 
+# if __name__ == "__main__":
+# 	result = load_json( "https://api.producthunt.com/v1/posts?days_ago=0&access_token=f9f96f658c15bddef464f6b7457884ea47c316aa42f7509206299d4f58d9aa08" )
+# 	print(result)
 

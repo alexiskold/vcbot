@@ -2,6 +2,7 @@ import bot_utils
 import angel_list
 import datetime
 import urllib
+import pdb
 
 def authenticate( url ):
 	return url + "&access_token=f9f96f658c15bddef464f6b7457884ea47c316aa42f7509206299d4f58d9aa08"
@@ -17,7 +18,9 @@ def recent_hunts( startup_map, url, max=1000 ):
 	print( "Product Hunt.recent_hunts => %s" % url ) 
 
 	ph_data = bot_utils.load_json( authenticate( url ) )
-	posts = ph_data.get( "posts" )
+	posts = []
+	if ph_data is not None:
+		posts = ph_data.get( "posts" )
 	count = 0
 	for post in posts:
 		name = post.get( "name" )
@@ -36,3 +39,7 @@ def recent_hunts( startup_map, url, max=1000 ):
 	return startup_map
 
 
+# if __name__ == "__main__":
+# 	startups = {}
+# 	recent_hunts( startups, "https://api.producthunt.com/v1/posts?days_ago=0")
+	# pdb.set_trace();

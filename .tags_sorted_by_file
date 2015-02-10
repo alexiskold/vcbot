@@ -1,0 +1,108 @@
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_PROGRAM_VERSION	5.8	//
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+Key_Attr_Check	angel_list.py	/^class Key_Attr_Check:$/;"	c
+Startup_Check	angel_list.py	/^class Startup_Check:$/;"	c
+__init__	angel_list.py	/^	def __init__( self, attrs ):$/;"	m	class:Key_Attr_Check
+al_checks	angel_list.py	/^al_checks = [ Startup_Check(), Key_Attr_Check( [ "name", "high_concept", "company_url" ] ) ]$/;"	v
+bot_utils	angel_list.py	/^import bot_utils$/;"	i
+create	angel_list.py	/^def create( al_data ):$/;"	f
+crunchbase	angel_list.py	/^import crunchbase$/;"	i
+datetime	angel_list.py	/^import datetime$/;"	i
+find_startup	angel_list.py	/^def find_startup( name ):$/;"	f
+funding	angel_list.py	/^def funding( startup ):$/;"	f
+json	angel_list.py	/^import json$/;"	i
+location	angel_list.py	/^def location( al_data ):$/;"	f
+match	angel_list.py	/^	def match( self, startup ):$/;"	m	class:Key_Attr_Check
+match	angel_list.py	/^	def match( self, startup ):$/;"	m	class:Startup_Check
+math	angel_list.py	/^import math$/;"	i
+property	angel_list.py	/^def property( startup, prop ):$/;"	f
+recent_startups	angel_list.py	/^def recent_startups( startup_map, url, max=1000 ):$/;"	f
+request	angel_list.py	/^import urllib.request$/;"	i
+tags	angel_list.py	/^def tags( al_data ):$/;"	f
+urllib	angel_list.py	/^import urllib$/;"	i
+urllib	angel_list.py	/^import urllib.request$/;"	i
+And_Check	bot_utils.py	/^class And_Check:$/;"	c
+Num_Property_Check	bot_utils.py	/^class Num_Property_Check:$/;"	c
+Or_Check	bot_utils.py	/^class Or_Check:$/;"	c
+Property_Check	bot_utils.py	/^class Property_Check:$/;"	c
+__init__	bot_utils.py	/^	def __init__( self ):$/;"	m	class:And_Check
+__init__	bot_utils.py	/^	def __init__( self ):$/;"	m	class:Or_Check
+__init__	bot_utils.py	/^	def __init__( self, check1, check2 ):$/;"	m	class:And_Check
+__init__	bot_utils.py	/^	def __init__( self, check1, check2 ):$/;"	m	class:Or_Check
+__init__	bot_utils.py	/^	def __init__( self, property, values ):$/;"	m	class:Property_Check
+__init__	bot_utils.py	/^	def __init__( self, property_name, min_value, max_value, allow_empty=False ):$/;"	m	class:Num_Property_Check
+add_check	bot_utils.py	/^	def add_check( check ):$/;"	m	class:And_Check
+add_check	bot_utils.py	/^	def add_check( check ):$/;"	m	class:Or_Check
+append_values	bot_utils.py	/^def append_values( data, prop, values ):$/;"	f
+create_date	bot_utils.py	/^def create_date( str ):$/;"	f
+datetime	bot_utils.py	/^import datetime$/;"	i
+find_names	bot_utils.py	/^def find_names( page_url, anchor_start, anchor_stop, hdrs=None ):$/;"	f
+json	bot_utils.py	/^import json$/;"	i
+load_json	bot_utils.py	/^def load_json( url ):$/;"	f
+load_url	bot_utils.py	/^def load_url( url, hdrs=None ):$/;"	f
+match	bot_utils.py	/^	def match( self, startup ):$/;"	m	class:And_Check
+match	bot_utils.py	/^	def match( self, startup ):$/;"	m	class:Num_Property_Check
+match	bot_utils.py	/^	def match( self, startup ):$/;"	m	class:Or_Check
+match	bot_utils.py	/^	def match( self, startup ):$/;"	m	class:Property_Check
+match_all	bot_utils.py	/^def match_all( data, checks ):$/;"	f
+match_one	bot_utils.py	/^def match_one( data, checks ):$/;"	f
+request	bot_utils.py	/^import urllib.request$/;"	i
+set_if_empty	bot_utils.py	/^def set_if_empty( data, prop, value ):$/;"	f
+urllib	bot_utils.py	/^import urllib$/;"	i
+urllib	bot_utils.py	/^import urllib.request$/;"	i
+set_date_titles	cb_funding-rounds.html	/^    function set_date_titles() {$/;"	f
+authenticate	crunchbase.py	/^def authenticate( url ):$/;"	f
+base_api	crunchbase.py	/^base_api = "http:\/\/api.crunchbase.com\/v\/2\/"$/;"	v
+base_web	crunchbase.py	/^base_web = "http:\/\/www.crunchbase.com\/"$/;"	v
+bot_utils	crunchbase.py	/^import bot_utils$/;"	i
+datetime	crunchbase.py	/^import datetime$/;"	i
+fill	crunchbase.py	/^def fill( startup, cb_data, name ):$/;"	f
+find_startup	crunchbase.py	/^def find_startup( startup, name ):$/;"	f
+funding_web	crunchbase.py	/^funding_web = base_web + "funding-round\/"$/;"	v
+json	crunchbase.py	/^import json$/;"	i
+last_round	crunchbase.py	/^def last_round( startup ):$/;"	f
+location	crunchbase.py	/^def location( startup ):$/;"	f
+property	crunchbase.py	/^def property( startup, property, data="cb_data" ):$/;"	f
+recent_startups	crunchbase.py	/^def recent_startups( startup_map, url, max=1000 ):$/;"	f
+relationship	crunchbase.py	/^def relationship( startup, property, data="cb_data" ):$/;"	f
+request	crunchbase.py	/^import urllib.request$/;"	i
+tags	crunchbase.py	/^def tags( startup ):$/;"	f
+urllib	crunchbase.py	/^import urllib$/;"	i
+urllib	crunchbase.py	/^import urllib.request$/;"	i
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+adjust_path	product_hunt.py	/^def adjust_path( name ):$/;"	f
+angel_list	product_hunt.py	/^import angel_list$/;"	i
+authenticate	product_hunt.py	/^def authenticate( url ):$/;"	f
+bot_utils	product_hunt.py	/^import bot_utils$/;"	i
+datetime	product_hunt.py	/^import datetime$/;"	i
+recent_hunts	product_hunt.py	/^def recent_hunts( startup_map, url, max=1000 ):$/;"	f
+urllib	product_hunt.py	/^import urllib$/;"	i
+MIMEText	vcbot.py	/^from email.mime.text import MIMEText$/;"	i
+al_location_ids	vcbot.py	/^al_location_ids = [ 1664, 2071, 2078, 151731, 151642 ]$/;"	v
+al_recent	vcbot.py	/^def al_recent( startups, max_pages, locations ):$/;"	f
+angel_list	vcbot.py	/^import angel_list$/;"	i
+bot_utils	vcbot.py	/^import bot_utils$/;"	i
+cb_recent	vcbot.py	/^def cb_recent( startups, max_pages ):	$/;"	f
+crunchbase	vcbot.py	/^import crunchbase$/;"	i
+datetime	vcbot.py	/^import datetime$/;"	i
+f	vcbot.py	/^f = open('t.html', 'w')$/;"	v
+json	vcbot.py	/^import json$/;"	i
+locale	vcbot.py	/^import locale$/;"	i
+max_pages	vcbot.py	/^max_pages = 1$/;"	v
+pdb	vcbot.py	/^import pdb$/;"	i
+ph_recent	vcbot.py	/^def ph_recent( startups, max_pages ):	$/;"	f
+primary_locations	vcbot.py	/^primary_locations = [ 'new york', 'new york city', 'nyc', 'brooklyn', 'new york, new york', 'brooklyn, new york', 'new york, ny', ]$/;"	v
+product_hunt	vcbot.py	/^import product_hunt$/;"	i
+recent	vcbot.py	/^def recent( max_pages, al_location_ids, primary_locations, secondary_locations, tags ):$/;"	f
+results	vcbot.py	/^results = "<html><body>%s<\/body><\/html>" % to_html( startups )$/;"	v
+secondary_locations	vcbot.py	/^secondary_locations = [ 'los angeles',$/;"	v
+smtplib	vcbot.py	/^import smtplib$/;"	i
+sort_helper	vcbot.py	/^def sort_helper( startup ):$/;"	f
+startups	vcbot.py	/^startups = recent( max_pages, al_location_ids, primary_locations, secondary_locations, tags )$/;"	v
+tags	vcbot.py	/^tags = [ 'artificial intelligence', 'machine learning', $/;"	v
+time	vcbot.py	/^import time$/;"	i
+to_html	vcbot.py	/^def to_html( startups ):$/;"	f
+unique_tags	vcbot.py	/^def unique_tags( startups ):$/;"	f
