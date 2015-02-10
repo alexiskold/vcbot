@@ -1,0 +1,26 @@
+{
+    "al_location": {
+        "new-york-ny-1": 1664,
+        "nyc": 152126,
+        "long-beach-ny": 75174,
+        "new-york": 2071,
+        "brooklyn-new-york": 155286,
+        "west-new-york": 24930,
+        "new-york-new-york": 151642,
+        "new-york-visiting": 84375
+    },
+    "primary_locations": ["new york", "new york city", "nyc", "brooklyn", "new york, new york", "brooklyn, new york", "new york, ny"],
+    "secondary_locations": [ "los angeles",
+                            "london", "uk", "england", "united kingdom", "grb",
+                            "paris", "france", "fra", "paris, france", 
+                            "stockholm", "swe", "sweden", "helsinki", "finland", "fin",
+                            "spain", "spa", "madrid", "barcelona" ],
+
+    "tags": ["artificial intelligence", "machine learning", 
+                 "analytics", "big data", "big data analytics", "predictive analytics", 
+                 "bitcoin", "payments", "fintech", "finance technology", "cryptocurrency", "digital currency", 
+                 "connected cars", "hardware", "iot", "connected home", "internet of things", "wearable", "wearables","connected device", "connected devices", "robotics", "3d printing", "3d printing technology", "home automation",
+                 "e-commerce", "fashion tech", "advertising",
+                 "logistics", "sharing economy", "logistics software", "collaborative consumption",
+                 "saas", "infrastructure", "cloud", "enterprise software", "search", "enterprise security", "security", "b2b", "cloud management", "cloud computing"]
+}

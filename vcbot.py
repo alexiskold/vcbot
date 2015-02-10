@@ -7,6 +7,7 @@ import crunchbase
 import product_hunt
 import bot_utils
 import cb_scraping
+import pdb
 
 import smtplib
 from email.mime.text import MIMEText
@@ -109,7 +110,7 @@ def ph_recent( startups, max_pages ):
 def recent( max_pages, al_location_ids, primary_locations, secondary_locations, tags ):
 	startup_map = {}
 
-	cb_recent( startup_map, max_pages )
+	# cb_recent( startup_map, max_pages )
 	al_recent( startup_map, max_pages, al_location_ids )
 	ph_recent( startup_map, max_pages )
 
@@ -150,36 +151,34 @@ def unique_tags( startups ):
 def sort_helper( startup ):
 	d = startup.get( "updated" )
 	return - time.mktime( d.timetuple() )
-	
-max_pages = 5
-al_location_ids = [ 1664, 2071, 2078, 151731, 151642 ]
 
-primary_locations = [ 'new york', 'new york city', 'nyc', 'brooklyn', 'new york, new york', 'brooklyn, new york', 'new york, ny', ]
-secondary_locations = [ 'los angeles',
-						'london', 'uk', 'england', 'united kingdom', 'grb',
-						'paris', 'france', 'fra', 'paris, france', 
-						'stockholm', 'swe', 'sweden', 'helsinki', 'finland', 'fin'
-						'spain', 'spa', 'madrid', 'barcelona' ]
+def unpack_json( json_file ):
+	result =  json.loads(json_file.read())
+	return result
 
-tags = [ 'artificial intelligence', 'machine learning', 
-			 'analytics', 'big data', 'big data analytics', 'predictive analytics', 
-			 'bitcoin', 'payments', 'fintech', 'finance technology', 'cryptocurrency', 'digital currency', 
-			 'connected cars', 'hardware', 'iot', 'connected home', 'internet of things', 'wearable', 'wearables','connected device', 'connected devices', 'robotics', '3d printing', '3d printing technology', 'home automation',
-			 'e-commerce', 'fashion tech', 'advertising'
-			 'logistics', 'sharing economy', 'logistics software', 'collaborative consumption',
-			 'saas', 'infrastructure', 'cloud', 'enterprise software', 'search', 'enterprise security', 'security', 'b2b', 'cloud management', 'cloud computing' ]
+if __name__ == "__main__":
+	max_pages = 1
+
+	with open("bot_info.json", "r") as al_location_json:
+		result = unpack_json(al_location_json)
+		al_location = result.get("al_location")
+		primary_locations = result.get("primary_locations")
+		secondary_locations = result.get("secondary_locations")
+		tags = result.get("tags")
+
+	# pdb.set_trace()
+
+	al_location_ids = al_location.values() # get location id from dictionary
+
+	startups = recent( max_pages, al_location_ids, primary_locations, secondary_locations, tags ) # create massive dictionary
+
+	results = "<html><body>%s</body></html>" % to_html( startups ) # convert massive dictionary to htmls
+
+	send_email( 'alex.iskold@techstars.com', ['alex.iskold@techstars.com', 'kj.singh@techstars.com'], results ) 
 
 
-
-startups = recent( max_pages, al_location_ids, primary_locations, secondary_locations, tags )
-
-results = "<html><body>%s</body></html>" % to_html( startups )
-
-# send_email( 'alex.iskold@techstars.com', ['alex.iskold@techstars.com', 'kj.singh@techstars.com'], results )
-
-f = open('t.html', 'w')
-f.write( results )
-f.close()
+	with open('t.html', 'w') as f: 
+		f.write( results )
 
 
 

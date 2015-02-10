@@ -50,7 +50,7 @@ def fill( startup, cb_data, name ):
 		bot_utils.set_if_empty( startup, "short_description", property( startup, "short_description" ) )
 		bot_utils.set_if_empty( startup, "description", property( startup, "description" ) )
 		bot_utils.set_if_empty( startup, "url", property( startup, "homepage_url" ) )
-		startup[ "crunchbase_url" ] = base_web + "organization/" + name.lower().replace( " ", "-" )
+		startup[ "crunchbase_url" ] = base_web + "organization/" + name.lower().replace( " ", "-" ).replace( ".", "-")
 		bot_utils.set_if_empty( startup, "location", location( startup )  )
 		bot_utils.append_values( startup, "tags", tags( startup ) )
 		bot_utils.set_if_empty( startup, "total_funding", property( startup, "total_funding_usd" ) )
