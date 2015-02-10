@@ -159,7 +159,7 @@ def unpack_json( json_file ):
 if __name__ == "__main__":
 	max_pages = 1
 
-	with open("bot_info.json", "r") as al_location_json:
+	with open("config.json", "r") as al_location_json:
 		result = unpack_json(al_location_json)
 		al_location = result.get("al_location")
 		primary_locations = result.get("primary_locations")
