@@ -8,6 +8,7 @@ import product_hunt
 import bot_utils
 import cb_scraping
 import pdb
+import sys
 
 import smtplib
 from email.mime.text import MIMEText
@@ -95,10 +96,13 @@ def al_recent( startups, max_pages, locations ):
 
 	return startups
 
-def cb_recent( startups, max_pages ):
-	link = "./cb_funding-rounds.html"
-	cb_scraping.get_cb_content("http://www.crunchbase.com/funding-rounds", "./cb_funding-rounds.html")
-	crunchbase.recent_startups( startups, link)
+def cb_recent( startups, max_pages, scrap, use_cache):
+	link = "https://www.crunchbase.com/funding-rounds"
+	if scrap:
+		# if we were to scrap the page, pass use_cache to tell whether to
+		crunchbase.scrap_recent_startups( startups, link, use_cache)
+	else:
+		crunchbase.recent_startups( startups, name_json )
 	return startups
 
 
@@ -110,7 +114,7 @@ def ph_recent( startups, max_pages ):
 def recent( max_pages, al_location_ids, primary_locations, secondary_locations, tags ):
 	startup_map = {}
 
-	# cb_recent( startup_map, max_pages )
+	#scrap_cb_recent( startup_map, max_pages )
 	al_recent( startup_map, max_pages, al_location_ids )
 	ph_recent( startup_map, max_pages )
 
@@ -161,10 +165,14 @@ if __name__ == "__main__":
 
 	with open("config.json", "r") as al_location_json:
 		result = unpack_json(al_location_json)
+	if result != None:
 		al_location = result.get("al_location")
 		primary_locations = result.get("primary_locations")
 		secondary_locations = result.get("secondary_locations")
 		tags = result.get("tags")
+	else:
+		print("config.json file is not valid")
+		sys.exit(1)
 
 	# pdb.set_trace()
 

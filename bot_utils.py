@@ -5,6 +5,7 @@ import requests
 import datetime
 import json
 import traceback
+import re
 
 def load_json( url ):
 	results = None
@@ -29,23 +30,26 @@ def load_url( url, hdrs=None ):
 		print( "Can't load: " + url )	
 	return response
 
-def find_names( page_url, anchor_start, anchor_stop, hdrs=None ):
-	response = load_url( page_url, hdrs )
+# def find_names( page_url, anchor_start, anchor_stop, hdrs=None ):
+	# response = load_url( page_url, hdrs )
 
-	l = len( anchor_start )
-	l2 = len( anchor_stop )
-	names = set()
+	# names = re.findall('<h4><a title=.*? href="/organization/(.*?)"', response)
 
-	idx_start = 0
-	while idx_start != -1:
-		idx_start = response.find( anchor_start, idx_start )
-		if idx_start != -1:
-			idx_end = response.find( anchor_stop, idx_start + l )
-			name = response[ idx_start + l : idx_end ]
-			idx_start = idx_end + l2
-			names.add( name )
+	# return names
+	# l = len( anchor_start )
+	# l2 = len( anchor_stop )
+	# names = set()
 
-	return list( names )
+	# idx_start = 0
+	# while idx_start != -1:
+	# 	idx_start = response.find( anchor_start, idx_start )
+	# 	if idx_start != -1:
+	# 		idx_end = response.find( anchor_stop, idx_start + l )
+	# 		name = response[ idx_start + l : idx_end ]
+	# 		idx_start = idx_end + l2
+	# 		names.add( name )
+
+	# return list( names )
 
 def match_all( data, checks ):
 	for check in checks:

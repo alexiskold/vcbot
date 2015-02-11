@@ -1,21 +1,28 @@
 import json
 import urllib
 import urllib.request
+import re
 import datetime
 import bot_utils
+import cb_scraping
+import pdb
+
 
 base_api = "http://api.crunchbase.com/v/2/"
 base_web = "http://www.crunchbase.com/"
 funding_web = base_web + "funding-round/"
 
-def recent_startups( startup_map, url, max=1000 ):
-	print( "Crunchbase.recent_startups => %s" % url ) 
+def scrap_recent_startups( startup_map, url, use_cache, max=1000):
+	if use_cache:
+		with open("cb_funding_rounds.html", "r") as page_source:
+			page = page_source.read()
+	else:
+		page = cb_scraping.get_cb_content( url, "cb_funding_rounds.html")
 
-	names = bot_utils.find_names( url, '<h4><a href="/organization/', '"', {} )
-	# HACK: CB returns template: instead of actual page for pages 2-4
-	if len( names ) == 0:
-		names = bot_utils.find_names( url, 'u003Ca href=\\"/organization/', '\\"', {} )
-	
+	names = re.findall('<h4><a title=.*? href="/organization/(.*?)"', page)
+
+	# pdb.set_trace()
+
 	count = 0
 	for name in names:
 		startup = {}
@@ -26,6 +33,10 @@ def recent_startups( startup_map, url, max=1000 ):
 				if count > max:
 					break
 	return startup_map
+
+def recent_startups( startups_map, input_json ):
+	"""If the name/uuids are given then use this instead of scrapping the page"""
+	pass
 
 def find_startup( startup, name ):
 	if startup.get( "cb_data" ) is not None:
@@ -116,6 +127,6 @@ def tags( startup ):
 
 if __name__ == "__main__":
 	startups = {}
-	recent_startups(startups, "./cb_funding-rounds.html", max=10)
+	scrap_recent_startups(startups, "https://www.crunchbase.com/funding-rounds", False, max=10)
 	print(startups)
 

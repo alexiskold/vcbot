@@ -9,8 +9,8 @@ def timeout_check(driver, secs, ready):
     reload_counter = 0
     passed_interactive_phase = ready
     while True:
-        time.sleep(1)
-        reload_counter += 1
+        time.sleep(3)
+        reload_counter += 3
         print("The readyState is {0}".format(driver.execute_script("return document.readyState")))
         if reload_counter > secs:
             print("Error: Connection timeout")
@@ -30,7 +30,7 @@ def page_down(driver, times):
     timeout_check(driver, 5, True)
 
 
-def get_cb_content(link, output_page):
+def get_cb_content(link, output_page=None):
     try:
         driver = webdriver.Chrome()
     except WebDriverException as e:
@@ -54,13 +54,16 @@ def get_cb_content(link, output_page):
     driver.set_window_position(0, 0)
 
     #TI: implement console feedback
-    timeout_check(driver, 20, False) #wait 20 seconds max for content
+    timeout_check(driver, 20, True) #wait 20 seconds max for content
     page_down(driver, 1) #Scroll down once
+    timeout_check(driver, 20, True) #wait 20 seconds max for content
+
     page_html = driver.page_source
     driver.quit()
-    with open(output_page, "w") as f:
-        f.write(page_html)
-    return(page_html)
+    if output_page is not None:
+        with open(output_page, "w") as f:
+            f.write(page_html)
+    return page_html
 
 if __name__ == "__main__":
     get_cb_content("https://www.crunchbase.com/funding-rounds", "cb_funding-rounds.html")
