@@ -42,7 +42,7 @@ def find_startup( startup, name ):
 	if startup.get( "cb_data" ) is not None:
 		return True
 
-	path = name.lower().replace( " ", "-" )
+	path = name.lower().replace( " ", "-" ).replace( ".", "-")
 	url = authenticate( base_api + "organization/" + path )
 	cb_data = bot_utils.load_json( url )
 	if cb_data is not None:
