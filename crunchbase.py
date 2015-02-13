@@ -21,7 +21,7 @@ def scrap_recent_startups( startup_map, url, use_cache, max_page, max_startup=10
 
 	names = re.findall('<h4><a title=.*? href="/organization/(.*?)"', page)
 
-	ipdb.set_trace()
+	# ipdb.set_trace()
 
 	count = 0
 	for name in names:
