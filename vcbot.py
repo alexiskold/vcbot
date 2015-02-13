@@ -173,11 +173,11 @@ if __name__ == "__main__":
 		description='This is VCBOT!!',
 		epilog="did I say, this is VCBOT!!")
 
-	parser.add_argument('--config', help="specify config file", default="config_ny.json", )
+	parser.add_argument('--config', metavar="[CONFIG FILE]", help="specify config file (all files must be stored under config/", default="config_ny.json", )
 
 	parse_result = parser.parse_args(sys.argv[1:])
 
-	config_file = "/config/{0}".format(parse_result.config)
+	config_file = "config/{0}".format(parse_result.config)
 
 	# ipdb.set_trace()
 
