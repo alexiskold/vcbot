@@ -2,15 +2,20 @@ import json
 import datetime
 import time
 import locale
+import sys
+import argparse
 
+#development only
+import ipdb
+
+#local import - needs to change to relative package import
 import angel_list
 import crunchbase
 import product_hunt
 import bot_utils
 import cb_scraping
-import ipdb
-import sys
 
+#emailing
 import smtplib
 from email.mime.text import MIMEText
 
@@ -163,15 +168,28 @@ def unpack_json( json_file ):
 	return result
 
 if __name__ == "__main__":
-	max_pages = 2
 
-	with open("config/config.json", "r") as al_location_json:
+	parser = argparse.ArgumentParser(
+		description='This is VCBOT!!',
+		epilog="did I say, this is VCBOT!!")
+
+	parser.add_argument('--config', help="specify config file", default="config_ny.json", )
+
+	parse_result = parser.parse_args(sys.argv[1:])
+
+	config_file = "/config/{0}".format(parse_result.config)
+
+	# ipdb.set_trace()
+
+	with open(config_file, "r") as al_location_json:
 		result = unpack_json(al_location_json)
 	if result != None:
 		al_location = result.get("al_location")
 		primary_locations = result.get("primary_locations")
 		secondary_locations = result.get("secondary_locations")
 		tags = result.get("tags")
+		max_pages = result.get("max_pages")
+
 	else:
 		print("config.json file is not valid")
 		sys.exit(1)
