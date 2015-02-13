@@ -12,12 +12,12 @@ base_api = "http://api.crunchbase.com/v/2/"
 base_web = "http://www.crunchbase.com/"
 funding_web = base_web + "funding-round/"
 
-def scrap_recent_startups( startup_map, url, use_cache, max=1000):
+def scrap_recent_startups( startup_map, url, use_cache, max_page=5):
 	if use_cache:
 		with open("cb_funding_rounds.html", "r") as page_source:
 			page = page_source.read()
 	else:
-		page = cb_scraping.get_cb_content( url, "cb_funding_rounds.html")
+		page = cb_scraping.get_cb_content( url, "cb_funding_rounds.html", max_page)
 
 	names = re.findall('<h4><a title=.*? href="/organization/(.*?)"', page)
 
@@ -30,7 +30,7 @@ def scrap_recent_startups( startup_map, url, use_cache, max=1000):
 				startup_map[ name ] = startup
 				print( "Found via CB: " + name )
 				count = count + 1
-				if count > max:
+				if count > max_page:
 					break
 	return startup_map
 

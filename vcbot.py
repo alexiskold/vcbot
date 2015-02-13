@@ -2,6 +2,7 @@ import json
 import datetime
 import time
 import locale
+
 import angel_list
 import crunchbase
 import product_hunt
@@ -100,7 +101,7 @@ def cb_recent( startups, max_pages, scrap, use_cache):
 	link = "https://www.crunchbase.com/funding-rounds"
 	if scrap:
 		# if we were to scrap the page, pass use_cache to tell whether to
-		crunchbase.scrap_recent_startups( startups, link, use_cache)
+		crunchbase.scrap_recent_startups( startups, link, use_cache, max_pages)
 	else:
 		crunchbase.recent_startups( startups, name_json )
 	return startups
@@ -114,7 +115,7 @@ def ph_recent( startups, max_pages ):
 def recent( max_pages, al_location_ids, primary_locations, secondary_locations, tags ):
 	startup_map = {}
 
-	#scrap_cb_recent( startup_map, max_pages )
+	cb_recent( startup_map, max_pages, scrap=True, use_cache=False)
 	al_recent( startup_map, max_pages, al_location_ids )
 	ph_recent( startup_map, max_pages )
 
@@ -161,9 +162,9 @@ def unpack_json( json_file ):
 	return result
 
 if __name__ == "__main__":
-	max_pages = 1
+	max_pages = 2
 
-	with open("config.json", "r") as al_location_json:
+	with open("config/config.json", "r") as al_location_json:
 		result = unpack_json(al_location_json)
 	if result != None:
 		al_location = result.get("al_location")
@@ -182,7 +183,7 @@ if __name__ == "__main__":
 
 	results = "<html><body>%s</body></html>" % to_html( startups ) # convert massive dictionary to htmls
 
-	send_email( 'alex.iskold@techstars.com', ['alex.iskold@techstars.com', 'kj.singh@techstars.com'], results ) 
+	# send_email( 'yoland.yan@techstars.com', ['alex.iskold@techstars.com', 'kj.singh@techstars.com'], results ) 
 
 
 	with open('t.html', 'w') as f: 

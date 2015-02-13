@@ -26,11 +26,11 @@ def timeout_check(driver, secs, ready):
     return None
 
 def page_down(driver, times):
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    timeout_check(driver, 5, True)
+    for i in range(times):
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        timeout_check(driver, 5, True)
 
-
-def get_cb_content(link, output_page=None):
+def get_cb_content(link, output_page, max_pages):
     try:
         driver = webdriver.Chrome()
     except WebDriverException as e:
@@ -55,7 +55,7 @@ def get_cb_content(link, output_page=None):
 
     #TI: implement console feedback
     timeout_check(driver, 20, True) #wait 20 seconds max for content
-    page_down(driver, 1) #Scroll down once
+    page_down(driver, max_pages) #Scroll down once
     timeout_check(driver, 20, True) #wait 20 seconds max for content
 
     page_html = driver.page_source
