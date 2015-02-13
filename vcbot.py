@@ -8,7 +8,7 @@ import crunchbase
 import product_hunt
 import bot_utils
 import cb_scraping
-import pdb
+import ipdb
 import sys
 
 import smtplib
@@ -115,7 +115,8 @@ def ph_recent( startups, max_pages ):
 def recent( max_pages, al_location_ids, primary_locations, secondary_locations, tags ):
 	startup_map = {}
 
-	cb_recent( startup_map, max_pages, scrap=True, use_cache=False)
+	cb_recent( startup_map, max_pages, scrap=True, use_cache=True)
+	# ipdb.set_trace()
 	al_recent( startup_map, max_pages, al_location_ids )
 	ph_recent( startup_map, max_pages )
 
@@ -175,7 +176,7 @@ if __name__ == "__main__":
 		print("config.json file is not valid")
 		sys.exit(1)
 
-	# pdb.set_trace()
+	# ipdb.set_trace()
 
 	al_location_ids = al_location.values() # get location id from dictionary
 

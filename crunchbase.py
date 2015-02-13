@@ -5,14 +5,14 @@ import re
 import datetime
 import bot_utils
 import cb_scraping
-import pdb
+import ipdb
 
 
 base_api = "http://api.crunchbase.com/v/2/"
 base_web = "http://www.crunchbase.com/"
 funding_web = base_web + "funding-round/"
 
-def scrap_recent_startups( startup_map, url, use_cache, max_page=5):
+def scrap_recent_startups( startup_map, url, use_cache, max_page, max_startup=1000):
 	if use_cache:
 		with open("cb_funding_rounds.html", "r") as page_source:
 			page = page_source.read()
@@ -21,7 +21,7 @@ def scrap_recent_startups( startup_map, url, use_cache, max_page=5):
 
 	names = re.findall('<h4><a title=.*? href="/organization/(.*?)"', page)
 
-	# pdb.set_trace()
+	ipdb.set_trace()
 
 	count = 0
 	for name in names:
@@ -30,7 +30,7 @@ def scrap_recent_startups( startup_map, url, use_cache, max_page=5):
 				startup_map[ name ] = startup
 				print( "Found via CB: " + name )
 				count = count + 1
-				if count > max_page:
+				if count > max_startup:
 					break
 	return startup_map
 
