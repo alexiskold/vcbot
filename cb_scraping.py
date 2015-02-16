@@ -1,8 +1,10 @@
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 import time
-import pdb
 import sys
+
+# # development open
+# import pdb
 
 def timeout_check(driver, secs, ready):
     """If page is not loaded within the time requirement, then exit"""

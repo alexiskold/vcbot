@@ -5,7 +5,9 @@ import re
 import datetime
 import bot_utils
 import cb_scraping
-import ipdb
+
+# # development only
+# import ipdb
 
 
 base_api = "http://api.crunchbase.com/v/2/"

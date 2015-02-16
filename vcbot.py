@@ -5,8 +5,8 @@ import locale
 import sys
 import argparse
 
-#development only
-import ipdb
+# #development only
+# import ipdb
 
 #local import - needs to change to relative package import
 import angel_list
