@@ -2,7 +2,7 @@
 
 ###Description:
 
-This bot utilize Angel List, Producthunt, and Crunchbase's API to find recent startups that fit the requirement specified in `config/[CONFIG FILE]`. If there is any question, please email yoland.yan@techstars.com
+This bot utilize Angel List, Producthunt, and Crunchbase's API to find recent startups that fit the requirement specified in `config/[CONFIG FILE]`. The output file is called `t.html`
 
 ###Usage:
     run: python vcbot.py [-h] [--config [CONFIG FILE]]
