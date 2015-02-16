@@ -120,7 +120,7 @@ def ph_recent( startups, max_pages ):
 def recent( max_pages, al_location_ids, primary_locations, secondary_locations, tags ):
 	startup_map = {}
 
-	cb_recent( startup_map, max_pages, scrap=True, use_cache=False)
+	cb_recent( startup_map, max_pages, scrap=True, use_cache=True)
 	# ipdb.set_trace()
 	al_recent( startup_map, max_pages, al_location_ids )
 	ph_recent( startup_map, max_pages )
