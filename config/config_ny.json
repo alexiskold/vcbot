@@ -1,5 +1,7 @@
 {
     "max_pages": 2,
+    "scrap": true,
+    "use_scrapped_cache": false,
     "al_location": {
         "new-york-ny-1": 1664,
         "nyc": 152126,

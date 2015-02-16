@@ -117,11 +117,10 @@ def ph_recent( startups, max_pages ):
 		product_hunt.recent_hunts( startups, "https://api.producthunt.com/v1/posts?days_ago=%s" % page )
 	return startups
 
-def recent( max_pages, al_location_ids, primary_locations, secondary_locations, tags ):
+def recent( max_pages, al_location_ids, primary_locations, secondary_locations, tags, scrap=True, use_scrapped_cache=True):
 	startup_map = {}
 
-	cb_recent( startup_map, max_pages, scrap=True, use_cache=True)
-	# ipdb.set_trace()
+	cb_recent( startup_map, max_pages, scrap, use_scrapped_cache)
 	al_recent( startup_map, max_pages, al_location_ids )
 	ph_recent( startup_map, max_pages )
 
@@ -181,25 +180,30 @@ if __name__ == "__main__":
 
 	# ipdb.set_trace()
 
-	with open(config_file, "r") as al_location_json:
-		result = unpack_json(al_location_json)
+	with open(config_file, "r") as config_json:
+		# ipdb.set_trace()
+		result = unpack_json(config_json)
 	if result != None:
 		al_location = result.get("al_location")
 		primary_locations = result.get("primary_locations")
 		secondary_locations = result.get("secondary_locations")
 		tags = result.get("tags")
 		max_pages = result.get("max_pages")
+		scrap = result.get("scrap")
+		use_scrapped_cache = result.get("use_scrapped_cache")
 		print("Max amount of pages: {0}".format(max_pages))
 
 	else:
 		print("config.json file is not valid")
 		sys.exit(1)
 
+
+
 	# ipdb.set_trace()
 
 	al_location_ids = al_location.values() # get location id from dictionary
 
-	startups = recent( max_pages, al_location_ids, primary_locations, secondary_locations, tags ) # create massive dictionary
+	startups = recent( max_pages, al_location_ids, primary_locations, secondary_locations, tags, scrap, use_scrapped_cache) # create massive dictionary
 
 	results = "<html><body>%s</body></html>" % to_html( startups ) # convert massive dictionary to htmls
 
