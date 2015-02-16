@@ -108,7 +108,8 @@ def cb_recent( startups, max_pages, scrap, use_cache):
 		# if we were to scrap the page, pass use_cache to tell whether to
 		crunchbase.scrap_recent_startups( startups, link, use_cache, max_pages)
 	else:
-		crunchbase.recent_startups( startups, name_json )
+		# crunchbase.recent_startups( startups, name_json )
+		pass # Stub for now
 	return startups
 
 
