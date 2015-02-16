@@ -1,7 +1,6 @@
 *.pyc
 *.tags
 .DS_Store
-*.html
 *.sublime-workspace
 *.sublime-project
 __pycache__

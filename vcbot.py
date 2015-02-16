@@ -120,7 +120,7 @@ def ph_recent( startups, max_pages ):
 def recent( max_pages, al_location_ids, primary_locations, secondary_locations, tags ):
 	startup_map = {}
 
-	cb_recent( startup_map, max_pages, scrap=True, use_cache=True)
+	cb_recent( startup_map, max_pages, scrap=True, use_cache=False)
 	# ipdb.set_trace()
 	al_recent( startup_map, max_pages, al_location_ids )
 	ph_recent( startup_map, max_pages )
@@ -189,6 +189,7 @@ if __name__ == "__main__":
 		secondary_locations = result.get("secondary_locations")
 		tags = result.get("tags")
 		max_pages = result.get("max_pages")
+		print("Max amount of pages: {0}".format(max_pages))
 
 	else:
 		print("config.json file is not valid")
