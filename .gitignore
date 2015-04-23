@@ -5,3 +5,4 @@
 *.sublime-project
 __pycache__
 *.tags
+*.html

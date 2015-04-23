@@ -38,27 +38,26 @@ def get_cb_content(link, output_page, max_pages):
     except WebDriverException as e:
         print("chromedriver is not downloaded or Chrome is not installed\n"
             "Trying Firefox")
+        try:
+            driver = webdriver.Firefox()
+        except Exception as e:
+            print(e)
+            driver.quit()
+            sys.exit()
     except Exception as e:
         print(e)
         driver.quit()
         sys.exit()
-    try:
-        driver = webdriver.Firefox()
-    except Exception as e:
-        print(e)
-        #TI: implement a wrapper class around webdriver (__enter__, __exit__)
-        #    so I can use with statement for it
-        driver.quit()
-        sys.exit()
+
 
     #implement page check
     driver.get(link)
     driver.set_window_position(0, 0)
 
     #TI: implement console feedback
-    timeout_check(driver, 20, True) #wait 20 seconds max for content
+    timeout_check(driver, 60, True) #wait 20 seconds max for content
     page_down(driver, max_pages) #Scroll down once
-    timeout_check(driver, 20, True) #wait 20 seconds max for content
+    timeout_check(driver, 60, True) #wait 20 seconds max for content
 
     page_html = driver.page_source
     driver.quit()
